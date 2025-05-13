@@ -1,0 +1,211 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: 'Poppins',sans-serif;
+}
+.primary-text {
+  color: #4a6c5e;
+}
+
+.second-text {
+  color: #4a6c5e;
+}
+
+.primary-bg {
+  background-color: #cfcfcf;
+}
+
+.secondary-bg {
+  background-color: #cfcfcf;
+}
+
+.rounded-full {
+  border-radius: 100%;
+}
+
+#wrapper {
+  background: #ffff ;
+}
+
+#sidebar-wrapper {
+  min-height: 100vh;
+  margin-left: -15rem;
+  -webkit-transition: margin 0.25s ease-out;
+  -moz-transition: margin 0.25s ease-out;
+  -o-transition: margin 0.25s ease-out;
+  transition: margin 0.25s ease-out;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+}
+.box{
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+
+}
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 15rem;
+}
+
+#page-content-wrapper {
+  min-width: 100vw;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+
+#menu-toggle {
+  cursor: pointer;
+}
+
+.list-group-item {
+  border: none;
+  padding: 20px 30px;
+}
+body.modal-open {
+  filter: blur(5px); /* Adjust blur strength as needed */
+}
+
+/* Optional: style the modal backdrop if needed */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5); /* Optional: background for the backdrop */
+}
+.list-group-item.active {
+  background-color: transparent;
+  color: #4a6c5e;
+  font-weight: bold;
+  border: none;
+}
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box i {
+  position: absolute;
+  left: 10px;
+  color: rgb(0, 0, 0);
+}
+.search-box .form-control {
+  padding-left: 35px; /* Add space for the search icon */
+  border-radius: 20px;
+  max-width: 450px; /* Adjust width if needed */
+}
+.search-box input {
+  padding-left: 30px; /* Add padding to leave space for the icon */
+  width: 350px; /* Adjust width as needed */
+  border-radius: 20px;
+  border: 1px solid #668678;
+}
+
+.container-fluid{
+  margin-top: -70px;
+
+}
+.table {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.table-bordered > thead > tr > th {
+  background-color: #668678 !important; /* Override Bootstrap's blue */
+  color: white !important; /* Set text color to white */
+  text-align: center; /* Optional: Center align text */
+  padding: 10px; /* Optional: Add padding */
+}
+.table th {
+  background-color: #007bff;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+}
+
+.table td {
+  text-align: center;
+  padding: 15px;
+  vertical-align: middle;
+}
+  
+  .card {
+    border-radius: 1rem;
+  }
+  
+  .table-scroll {
+    border-radius: .4rem;
+    scrollbar-width: none;
+  }
+  
+  .table-scroll table thead th {
+    font-size: 1rem;
+  }
+  thead {
+    top: 0;
+    position: sticky;
+  }
+
+  .btns{
+    border: #cfcfcf;
+    padding: 5px;
+  }
+  .modal{
+    background: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease-in-out;    }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+@media (max-width: 768px) {
+  .btn {
+    font-size: 12px;
+    padding: 5px;
+  }
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0;
+  }
+
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%;
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -15rem;
+  }
+}
+@media screen and (max-width: 767px) {
+  .modal-dialog {
+    max-width: 100%;
+    margin: 20px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+}
