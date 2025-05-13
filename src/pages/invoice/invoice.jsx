@@ -227,184 +227,296 @@ const Invoice = () => {
           </div>
         </nav>
 
-        <div className="container-fluid px-4">
-          <div className="row g-3 mt-3">
-            {['electric', 'water', 'cusa', 'payment'].map(type => (
-              <div className="col-md-3" key={type}>
-                <button
-                  className={`btn w-100${selectedBill === type ? ' selected-btn' : ''}`}
-                  onClick={() => showTable(type)}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)} Bill
-                </button>
+        <div className="container-fluid px-4 py-4">
+          <div className="row g-4">
+            {/* Stats Cards */}
+            <div className="col-12 col-md-6 col-xl-3">
+              <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                  <h6 className="text-muted mb-2">Total Bills</h6>
+                  <div className="d-flex align-items-center">
+                    <i className='bx bx-file fs-1 text-primary'></i>
+                    <h3 className="ms-2 mb-0">{allBill.length}</h3>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+            </div>
 
-          {displayTable && (
-            <div className="mt-4">
-              <div
-                className="table-responsive table-scroll"
-                style={{ position: 'relative', height: 740, overflowY: 'auto', border: '1px solid #ddd' }}
-              >
-                <table className="table table-bordered custom-table mb-0">
-                  <thead className="table-header" style={{ position: 'sticky', top: 0, backgroundColor: '#f8f9fa', zIndex: 1 }}>
-                    <tr>
-                      <th>User ID</th>
-                      <th>Full Name</th>
-                      <th>Email</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsers.map(user => (
-                      <tr key={user.user_id}>
-                        <td>{user.user_id}</td>
-                        <td>{user.fullname}</td>
-                        <td>{user.email}</td>
-                        <td>
-                          <button className="btn" onClick={() => openUploadModal(user)}>Upload</button>
-                        </td>
-                      </tr>
+            {/* Bill Type Buttons */}
+            <div className="col-12">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-white py-3">
+                  <div className="d-flex flex-wrap justify-content-between align-items-center">
+                    <h5 className="card-title mb-0">Bill Categories</h5>
+                  </div>
+                </div>
+                <div className="card-body">
+                  <div className="row g-3">
+                    {['electric', 'water', 'cusa', 'payment'].map(type => (
+                      <div className="col-12 col-sm-6 col-lg-3" key={type}>
+                        <button
+                          className={`btn w-100 ${selectedBill === type ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={() => showTable(type)}
+                        >
+                          <i className={`bx bx-${type === 'electric' ? 'bulb' : type === 'water' ? 'water' : type === 'cusa' ? 'building-house' : 'credit-card'} me-2`}></i>
+                          {type.charAt(0).toUpperCase() + type.slice(1)} Bill
+                        </button>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          <div className="row mb-3 p-4">
-            <div className="col-md-3">
-              <label htmlFor="monthSelect">Month:</label>
-              <select
-                id="monthSelect"
-                className="form-control"
-                value={selectedMonth}
-                onChange={e => setSelectedMonth(e.target.value)}
-              >
-                <option value="">All</option>
-                {months.map(month => (
-                  <option key={month} value={month}>{month}</option>
-                ))}
-              </select>
-            </div>
-            <div className="col-md-3">
-              <label htmlFor="yearSelect">Year:</label>
-              <select
-                id="yearSelect"
-                className="form-control"
-                value={selectedYear}
-                onChange={e => setSelectedYear(e.target.value)}
-              >
-                <option value="">All</option>
-                {years.map(year => (
-                  <option key={year} value={year}>{year}</option>
-                ))}
-              </select>
-            </div>
-            <div className="col-md-3">
-              <label htmlFor="billTypeSelect">Bill Type:</label>
-              <select
-                id="billTypeSelect"
-                className="form-control"
-                value={selectedBillType}
-                onChange={e => setSelectedBillType(e.target.value)}
-              >
-                <option value="">All</option>
-                {billTypes.map(billType => (
-                  <option key={billType} value={billType}>{billType}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="table-responsive table-scroll" style={{ position: 'relative', height: 760 }}>
-            <table className="table table-bordered custom-table mb-0">
-              <thead className="head">
-                <tr>
-                  <th>Bill ID</th>
-                  <th>Name</th>
-                  <th>Bill Type</th>
-                  <th>Date</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBills.map(bill => (
-                  <tr key={bill.bill_id}>
-                    <td>{bill.bill_id}</td>
-                    <td>{bill.fullname}</td>
-                    <td>{bill.bill_type}</td>
-                    <td>{new Date(bill.created_at).toLocaleDateString()}</td>
-                    <td>
-                      <button className="btn btn-primary" onClick={() => payment(bill)}>View</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Image View Modal */}
-          {isImageModalVisible && (
-            <div id="imageViewModal" className="modal-overlay" style={{
-              position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-              background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-            }}>
-              <div className="modal-content" style={{ background: '#fff', borderRadius: 8, padding: 20, position: 'relative' }}>
-                <div className="modal-header">
-                  <button className="btn-close" onClick={closeImageModal}></button>
-                </div>
-                <div className="modal-body text-center">
-                  <img
-                    src={`http://localhost/${selectedBillImage}`}
-                    alt="Bill"
-                    className="img-fluid"
-                    style={{ maxHeight: '80vh', objectFit: 'contain' }}
-                  />
+                  </div>
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Custom Modal */}
-          {isModalVisible && (
-            <div id="customModal" className="modal-overlay" style={{
-              position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-              background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
-            }}>
-              <div className="modal-content" style={{ background: '#fff', borderRadius: 8, padding: 20, position: 'relative' }}>
-                <div className="modal-header">
-                  <h5 className="modal-title">Upload Document for {selectedUser?.fullname}</h5>
-                  <button className="btn-close" onClick={closeModal}></button>
+            {/* Filters Section */}
+            <div className="col-12">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-white py-3">
+                  <div className="d-flex flex-wrap justify-content-between align-items-center">
+                    <h5 className="card-title mb-0">Filter Bills</h5>
+                  </div>
                 </div>
-                <div className="modal-body">
-                  <form onSubmit={submitBillForm}>
-                    <div className="mb-3">
-                      <label htmlFor="fileInput" className="form-label">Upload Image</label>
-                      <input type="file" id="fileInput" className="form-control" onChange={onFileChange} />
-                      <label htmlFor="billTypeDropdown" className="form-label">Select Bill Type</label>
+                <div className="card-body">
+                  <div className="row g-3">
+                    <div className="col-12 col-md-4">
+                      <label htmlFor="monthSelect" className="form-label">Month</label>
                       <select
-                        id="billTypeDropdown"
+                        id="monthSelect"
                         className="form-select"
-                        value={selectedBill}
-                        onChange={e => setSelectedBill(e.target.value)}
-                        required
+                        value={selectedMonth}
+                        onChange={e => setSelectedMonth(e.target.value)}
                       >
-                        <option value="" disabled>Choose Bill Type</option>
-                        <option value="electric">Electric Bill</option>
-                        <option value="water">Water Bill</option>
-                        <option value="cusa">CUSA Bill</option>
-                        <option value="payment">Payment Bill</option>
+                        <option value="">All Months</option>
+                        {months.map(month => (
+                          <option key={month} value={month}>{month}</option>
+                        ))}
                       </select>
                     </div>
-                    <button type="submit" className="btn" disabled={!uploadedFile || !selectedBill}>Submit</button>
-                  </form>
+                    <div className="col-12 col-md-4">
+                      <label htmlFor="yearSelect" className="form-label">Year</label>
+                      <select
+                        id="yearSelect"
+                        className="form-select"
+                        value={selectedYear}
+                        onChange={e => setSelectedYear(e.target.value)}
+                      >
+                        <option value="">All Years</option>
+                        {years.map(year => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-12 col-md-4">
+                      <label htmlFor="billTypeSelect" className="form-label">Bill Type</label>
+                      <select
+                        id="billTypeSelect"
+                        className="form-select"
+                        value={selectedBillType}
+                        onChange={e => setSelectedBillType(e.target.value)}
+                      >
+                        <option value="">All Types</option>
+                        {billTypes.map(billType => (
+                          <option key={billType} value={billType}>
+                            {billType.charAt(0).toUpperCase() + billType.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Users Table */}
+            {displayTable && (
+              <div className="col-12">
+                <div className="card border-0 shadow-sm">
+                  <div className="card-header bg-white py-3">
+                    <div className="d-flex flex-wrap justify-content-between align-items-center">
+                      <h5 className="card-title mb-0">User List</h5>
+                      <div className="d-flex gap-2">
+                        <div className="search-box">
+                          <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search users..."
+                            value={searchTerm}
+                            onChange={e => { setSearchTerm(e.target.value); applySearchFilter(); }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-body p-0">
+                    <div className="table-container">
+                      <div className="table-scroll">
+                        <table className="table table-hover mb-0">
+                          <thead>
+                            <tr>
+                              <th>User ID</th>
+                              <th>Full Name</th>
+                              <th className="d-none d-md-table-cell">Email</th>
+                              <th>Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {filteredUsers.map(user => (
+                              <tr key={user.user_id}>
+                                <td>#{user.user_id}</td>
+                                <td>
+                                  <div className="d-flex align-items-center">
+                                    <div className="avatar-circle bg-primary text-white me-2">
+                                      {user.fullname.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                      <h6 className="mb-0">{user.fullname}</h6>
+                                      <small className="text-muted d-md-none">{user.email}</small>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="d-none d-md-table-cell">{user.email}</td>
+                                <td>
+                                  <button 
+                                    className="btn btn-primary btn-sm px-3"
+                                    onClick={() => openUploadModal(user)}
+                                  >
+                                    <i className="bx bx-upload me-1"></i>
+                                    Upload
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Bills Table */}
+            <div className="col-12">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-white py-3">
+                  <div className="d-flex flex-wrap justify-content-between align-items-center">
+                    <h5 className="card-title mb-0">Bills List</h5>
+                  </div>
+                </div>
+                <div className="card-body p-0">
+                  <div className="table-container">
+                    <div className="table-scroll">
+                      <table className="table table-hover mb-0">
+                        <thead>
+                          <tr>
+                            <th>Bill ID</th>
+                            <th>Name</th>
+                            <th className="d-none d-md-table-cell">Bill Type</th>
+                            <th className="d-none d-md-table-cell">Date</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredBills.map(bill => (
+                            <tr key={bill.bill_id}>
+                              <td>#{bill.bill_id}</td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <div className="avatar-circle bg-primary text-white me-2">
+                                    {bill.fullname.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <h6 className="mb-0">{bill.fullname}</h6>
+                                    <small className="text-muted d-md-none">
+                                      {bill.bill_type} - {new Date(bill.created_at).toLocaleDateString()}
+                                    </small>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="d-none d-md-table-cell">{bill.bill_type}</td>
+                              <td className="d-none d-md-table-cell">
+                                {new Date(bill.created_at).toLocaleDateString()}
+                              </td>
+                              <td>
+                                <button 
+                                  className="btn btn-primary btn-sm px-3"
+                                  onClick={() => payment(bill)}
+                                >
+                                  <i className="bx bx-show me-1"></i>
+                                  View
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Image View Modal */}
+        {isImageModalVisible && (
+          <div id="imageViewModal" className="modal-overlay" style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+          }}>
+            <div className="modal-content" style={{ background: '#fff', borderRadius: 8, padding: 20, position: 'relative' }}>
+              <div className="modal-header">
+                <button className="btn-close" onClick={closeImageModal}></button>
+              </div>
+              <div className="modal-body text-center">
+                <img
+                  src={`http://localhost/${selectedBillImage}`}
+                  alt="Bill"
+                  className="img-fluid"
+                  style={{ maxHeight: '80vh', objectFit: 'contain' }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Modal */}
+        {isModalVisible && (
+          <div id="customModal" className="modal-overlay" style={{
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+            background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+          }}>
+            <div className="modal-content" style={{ background: '#fff', borderRadius: 8, padding: 20, position: 'relative' }}>
+              <div className="modal-header">
+                <h5 className="modal-title">Upload Document for {selectedUser?.fullname}</h5>
+                <button className="btn-close" onClick={closeModal}></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={submitBillForm}>
+                  <div className="mb-3">
+                    <label htmlFor="fileInput" className="form-label">Upload Image</label>
+                    <input type="file" id="fileInput" className="form-control" onChange={onFileChange} />
+                    <label htmlFor="billTypeDropdown" className="form-label">Select Bill Type</label>
+                    <select
+                      id="billTypeDropdown"
+                      className="form-select"
+                      value={selectedBill}
+                      onChange={e => setSelectedBill(e.target.value)}
+                      required
+                    >
+                      <option value="" disabled>Choose Bill Type</option>
+                      <option value="electric">Electric Bill</option>
+                      <option value="water">Water Bill</option>
+                      <option value="cusa">CUSA Bill</option>
+                      <option value="payment">Payment Bill</option>
+                    </select>
+                  </div>
+                  <button type="submit" className="btn" disabled={!uploadedFile || !selectedBill}>Submit</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -246,9 +246,11 @@ const Residents = () => {
   return (
     <div className="d-flex" id="wrapper">
       {/* Sidebar */}
-      <div className="bg-white" id="sidebar-wrapper" style={{ position: 'fixed', height: '100vh', width: 250 }}>
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">BuenaVista</div>
-        <div className="list-group list-group-flush my-1">
+      <div className="bg-white shadow-sm sidebar" id="sidebar-wrapper">
+        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold text-primary border-bottom">
+          <i className='bx bxs-building-house me-2'></i>BuenaVista
+        </div>
+        <div className="list-group list-group-flush my-3">
           <a href="/home" className="list-group-item list-group-item-action bg-transparent second-text active">
             <i className="fas fa-tachometer-alt me-2"></i>Dashboard
           </a>
@@ -270,163 +272,231 @@ const Residents = () => {
         </div>
       </div>
 
-      <div id="page-content-wrapper" style={{ marginLeft: 250, width: 'calc(100% - 250px)' }}>
-        <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
-          <div className="d-flex align-items-center">
-            <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-            <h2 className="fs-2 m-0">Residents</h2>
-          </div>
-        </nav>
+      {/* Main Content */}
+      <div id="page-content-wrapper" className="bg-light">
+        {/* Navbar */}
 
-        <div className="container-fluid px-4">
-          <div className="row my-5">
-            <div className="d-flex justify-content-end align-items-center mb-3">
-              {/* Search Box */}
-              <div className="search-box me-2">
-                <i className="bx bx-search-alt-2"></i>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Search here..."
-                  value={searchTerm}
-                  onChange={e => { setSearchTerm(e.target.value); applySearchFilter(); }}
-                />
-              </div>
-              {/* Add User Button */}
-              <button className="btns btn btn-primary me-2" onClick={() => openForm()}>
-                <i className="bx bx-plus"></i> Add User
-              </button>
-              {/* Toggle Archived View Button */}
-              <div className="ms-3">
-                <button className="btn btn-secondary" onClick={toggleArchivedView}>
-                  {showArchivedUsers ? 'Show Active Users' : 'Show Archived Users'}
-                </button>
+
+        {/* Main Content Area */}
+        <div className="container-fluid px-4 py-4">
+          <div className="row g-4">
+            {/* Stats Cards */}
+            <div className="col-12 col-md-6 col-xl-3">
+              <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                  <h6 className="text-muted mb-2">Total Residents</h6>
+                  <div className="d-flex align-items-center">
+                    <i className='bx bx-user-circle fs-1 text-primary'></i>
+                    <h3 className="ms-2 mb-0">{users.length}</h3>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="container">
-              <div className="row justify-content-center">
-                <div className="col-12">
-                  <div className="card">
-                    <div className="card-body p-0">
-                      <div className="table-responsive table-scroll">
-                        <table className="table table-bordered custom-table mb-0">
-                          <thead>
-                            <tr>
-                              <th>User ID</th>
-                              <th>Full Name</th>
-                              <th>Email</th>
-                              <th>House#</th>
-                              <th>Contact</th>
-                              {showArchivedUsers && <th>Role</th>}
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {tableUsers.length > 0 ? (
-                              tableUsers.map(user => (
-                                <tr key={user.user_id}>
-                                  <td>{user.user_id}</td>
-                                  <td>{user.fullname}</td>
-                                  <td>{user.email}</td>
-                                  <td>{user.house_number}</td>
-                                  <td>{user.contact}</td>
-                                  {showArchivedUsers && <td>{getRoleName(user.role_id)}</td>}
-                                  <td>
-                                    {!showArchivedUsers ? (
-                                      <button className="btn btn-sm btn-warning" onClick={() => archiveUser(user.user_id)}>Archive</button>
-                                    ) : (
-                                      <button className="btn btn-sm btn-success" onClick={() => restoreUser(user.user_id)}>Restore</button>
-                                    )}
-                                  </td>
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td colSpan={showArchivedUsers ? 7 : 6} className="text-center">No users found</td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
+            <div className="col-12 col-md-6 col-xl-3">
+              <div className="card border-0 shadow-sm">
+                <div className="card-body">
+                  <h6 className="text-muted mb-2">Archived Users</h6>
+                  <div className="d-flex align-items-center">
+                    <i className='bx bx-archive fs-1 text-warning'></i>
+                    <h3 className="ms-2 mb-0">{archivedUsers.length}</h3>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Table Section */}
+            <div className="col-12">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-white py-3">
+                  <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                    <h5 className="card-title mb-0">
+                      {showArchivedUsers ? 'Archived Residents' : 'Active Residents'}
+                    </h5>
+                    
+                    <div className="d-flex flex-wrap gap-3">
+                      {/* Search Box */}
+                      <div className="position-relative">
+                        <input
+                          type="text"
+                          className="form-control search-input"
+                          placeholder="Search residents..."
+                          value={searchTerm}
+                          onChange={e => { setSearchTerm(e.target.value); applySearchFilter(); }}
+                        />
+                        <i className="bx bx-search position-absolute search-icon"></i>
                       </div>
+
+                      {/* Add User Button */}
+                      <button 
+                        className="btn btn-primary d-flex align-items-center"
+                        onClick={() => setIsFormVisible(true)}
+                      >
+                        <i className="bx bx-plus-circle me-2"></i>
+                        Add User
+                      </button>
+
+                      {/* Archive Toggle Button */}
+                      <button 
+                        className={`btn ${showArchivedUsers ? 'btn-success' : 'btn-warning'} d-flex align-items-center`}
+                        onClick={toggleArchivedView}
+                      >
+                        <i className={`bx ${showArchivedUsers ? 'bx-archive-out' : 'bx-archive-in'} me-2`}></i>
+                        {showArchivedUsers ? 'Show Active' : 'Show Archived'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="card-body p-0">
+                  <div className="table-container">
+                    <div className="table-scroll">
+                      <table className="table table-hover">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Resident</th>
+                            <th className="d-none d-md-table-cell">Contact Info</th>
+                            <th className="d-none d-lg-table-cell">House #</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tableUsers.map(user => (
+                            <tr key={user.user_id}>
+                              <td>#{user.user_id}</td>
+                              <td>
+                                <div className="d-flex align-items-center">
+                                  <div className="avatar-circle bg-primary text-white me-2">
+                                    {user.fullname.charAt(0).toUpperCase()}
+                                  </div>
+                                  <div>
+                                    <h6 className="mb-0">{user.fullname}</h6>
+                                    <small className="text-muted d-md-none">{user.email}</small>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="d-none d-md-table-cell">
+                                <div>
+                                  <div>{user.email}</div>
+                                  <small className="text-muted">{user.contact}</small>
+                                </div>
+                              </td>
+                              <td className="d-none d-lg-table-cell">{user.house_number}</td>
+                              <td>
+                                <div className="d-flex gap-2 justify-content-center">
+                                  {!showArchivedUsers ? (
+                                    <>
+                                      <button 
+                                        className="btn btn-primary px-3"
+                                        onClick={() => openForm(user)}
+                                        title="Edit User"
+                                      >
+                                        <i className="bx bx-edit-alt me-1"></i>
+                                        Edit
+                                      </button>
+                                      <button 
+                                        className="btn btn-warning px-3"
+                                        onClick={() => archiveUser(user.user_id)}
+                                        title="Archive User"
+                                      >
+                                        <i className="bx bx-archive-in me-1"></i>
+                                        Archive
+                                      </button>
+                                    </>
+                                  ) : (
+                                    <button 
+                                      className="btn btn-success px-3"
+                                      onClick={() => restoreUser(user.user_id)}
+                                      title="Restore User"
+                                    >
+                                      <i className="bx bx-archive-out me-1"></i>
+                                      Restore
+                                    </button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* Modal Form */}
-            {isFormVisible && (
-              <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                <div className="modal-dialog modal-dialog-centered">
-                  <div className="modal-content">
-                    <div className="modal-header">
-                      <h5 className="modal-title">{user_id ? 'Edit User' : 'Add User'}</h5>
-                      <button type="button" className="btn-close" onClick={closeForm}></button>
-                    </div>
-                    <div className="modal-body">
-                      <form onSubmit={editProfile}>
-                        {/* Full Name */}
-                        <div className="mb-3">
-                          <label htmlFor="fullname" className="form-label">Full Name</label>
-                          <input
-                            type="text"
-                            id="fullname"
-                            className="form-control"
-                            value={userForm.fullname}
-                            onChange={e => setUserForm({ ...userForm, fullname: e.target.value })}
-                            required
-                          />
-                        </div>
-                        {/* Email */}
-                        <div className="mb-3">
-                          <label htmlFor="email" className="form-label">Email</label>
-                          <input
-                            type="email"
-                            id="email"
-                            className="form-control"
-                            value={userForm.email}
-                            onChange={e => setUserForm({ ...userForm, email: e.target.value })}
-                            required
-                          />
-                        </div>
-                        {/* House Number */}
-                        <div className="mb-3">
-                          <label htmlFor="house_number" className="form-label">House #</label>
-                          <input
-                            type="text"
-                            id="house_number"
-                            className="form-control"
-                            value={userForm.house_number}
-                            onChange={e => setUserForm({ ...userForm, house_number: e.target.value })}
-                            required
-                          />
-                        </div>
-                        {/* Contact */}
-                        <div className="mb-3">
-                          <label htmlFor="contact" className="form-label">Contact</label>
-                          <input
-                            type="text"
-                            id="contact"
-                            className="form-control"
-                            value={userForm.contact}
-                            onChange={e => setUserForm({ ...userForm, contact: e.target.value })}
-                            required
-                          />
-                        </div>
-                        <button type="submit" className="btn btn-success w-100">
-                          <i className="bx bx-plus"></i> {user_id ? 'Update' : 'Add'} User
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
           </div>
         </div>
       </div>
+
+      {/* Modal Form */}
+      {isFormVisible && (
+        <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{user_id ? 'Edit User' : 'Add User'}</h5>
+                <button type="button" className="btn-close" onClick={closeForm}></button>
+              </div>
+              <div className="modal-body">
+                <form onSubmit={editProfile}>
+                  {/* Full Name */}
+                  <div className="mb-3">
+                    <label htmlFor="fullname" className="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      id="fullname"
+                      className="form-control"
+                      value={userForm.fullname}
+                      onChange={e => setUserForm({ ...userForm, fullname: e.target.value })}
+                      required
+                    />
+                  </div>
+                  {/* Email */}
+                  <div className="mb-3">
+                    <label htmlFor="email" className="form-label">Email</label>
+                    <input
+                      type="email"
+                      id="email"
+                      className="form-control"
+                      value={userForm.email}
+                      onChange={e => setUserForm({ ...userForm, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  {/* House Number */}
+                  <div className="mb-3">
+                    <label htmlFor="house_number" className="form-label">House #</label>
+                    <input
+                      type="text"
+                      id="house_number"
+                      className="form-control"
+                      value={userForm.house_number}
+                      onChange={e => setUserForm({ ...userForm, house_number: e.target.value })}
+                      required
+                    />
+                  </div>
+                  {/* Contact */}
+                  <div className="mb-3">
+                    <label htmlFor="contact" className="form-label">Contact</label>
+                    <input
+                      type="text"
+                      id="contact"
+                      className="form-control"
+                      value={userForm.contact}
+                      onChange={e => setUserForm({ ...userForm, contact: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-success w-100">
+                    <i className="bx bx-plus"></i> {user_id ? 'Update' : 'Add'} User
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
