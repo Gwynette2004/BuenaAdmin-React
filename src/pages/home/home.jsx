@@ -12,8 +12,10 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import autoTable from "jspdf-autotable";
 import "./home.css";
-import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 // Register Chart.js components
@@ -99,8 +101,6 @@ const Home = () => {
       console.error("Error fetching concerns:", error);
     }
   };
-
-  
 
   const retrieveReservations = async () => {
     try {
@@ -201,6 +201,77 @@ const Home = () => {
     }
   };
 
+  const generatePDF = async () => {
+    const doc = new jsPDF("p", "mm", "a4");
+    const currentDate = new Date().toLocaleDateString();
+
+    // Add Header
+    doc.setFontSize(18);
+    doc.setTextColor("#4a6c5e");
+    doc.text("Dashboard Report", 10, 10);
+    doc.setFontSize(12);
+    doc.setTextColor("#000");
+    doc.text(`Date: ${currentDate}`, 10, 20);
+
+    // Add User Stats
+    doc.setFontSize(14);
+    doc.setTextColor("#4a6c5e");
+    doc.text("Summary", 10, 30);
+    doc.setFontSize(12);
+    doc.setTextColor("#000");
+    doc.text(`Residents: ${userCount}`, 10, 40);
+    doc.text(`Concerns: ${concernCount}`, 10, 50);
+    doc.text(`Reservations: ${reservationCount}`, 10, 60);
+
+    // Add Concerns Table
+    autoTable(doc, {
+      startY: 70,
+      head: [["Name", "Email", "Concern", "Date"]],
+      body: concerns.map((concern) => [
+        concern.name,
+        concern.email,
+        concern.concern,
+        concern.created_at,
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: "#4a6c5e" },
+      styles: { fontSize: 10 },
+    });
+
+    // Add Reservations Table
+    autoTable(doc, {
+      startY: doc.lastAutoTable.finalY + 10,
+      head: [["ID", "Facility", "Date", "Time", "Content", "Status"]],
+      body: reservations.map((reservation) => [
+        reservation.reservation_id,
+        reservation.facility_name,
+        reservation.reservation_date,
+        reservation.reservation_time,
+        reservation.content,
+        reservation.status,
+      ]),
+      theme: "grid",
+      headStyles: { fillColor: "#4a6c5e" },
+      styles: { fontSize: 10 },
+    });
+
+    // Add Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(10);
+      doc.setTextColor("#888");
+      doc.text(
+        `Page ${i} of ${pageCount}`,
+        doc.internal.pageSize.width - 20,
+        doc.internal.pageSize.height - 10
+      );
+    }
+
+    // Save the PDF
+    doc.save("dashboard_report.pdf");
+  };
+
   return (
     <div className="d-flex" id="wrapper">
       {/* Sidebar */}
@@ -268,6 +339,10 @@ const Home = () => {
         </nav>
 
         <div className="container-fluid px-4">
+          <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+          />
           <div className="row justify-content-center my-4">
             <div className="col-12 col-sm-6 col-lg-4 p-2">
               <div className="box shadow p-4 bg-white d-flex justify-content-around align-items-center rounded">
@@ -302,32 +377,39 @@ const Home = () => {
 
           <div className="row g-3 my-2">
             <div className="col-md-7">
-                <div className="p-3 bg-white shadow rounded">
+              <div className="p-3 bg-white shadow rounded">
                 {barChartData.datasets && barChartData.datasets.length > 0 ? (
-                    <Bar data={barChartData} />
+                  <Bar data={barChartData} />
                 ) : (
-                    <p>Loading bar chart...</p>
+                  <p>Loading bar chart...</p>
                 )}
-                </div>
+              </div>
             </div>
 
             <div className="col-md-5">
-                <div className="p-3 bg-white shadow rounded">
-                    {barChartData.datasets && barChartData.datasets.length > 0 ? (
-                    <Pie data={pieChartData} />
-                    ) : (
-                    <p>Loading pie chart...</p>
-                    )}
-                </div>
+              <div className="p-3 bg-white shadow rounded">
+                {barChartData.datasets && barChartData.datasets.length > 0 ? (
+                  <Pie data={pieChartData} />
+                ) : (
+                  <p>Loading pie chart...</p>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="row g-4 my-4">
             <div className="col-md-5 col-sm-12">
-              <a href="/concerns" style={{ textDecoration: "none", color: "inherit" }}>
+              <a
+                href="/concerns"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 <div
                   className="p-3 bg-white shadow rounded"
-                  style={{ height: "500px", display: "flex", flexDirection: "column" }}
+                  style={{
+                    height: "500px",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
                 >
                   <h3 className="fs-5 mb-3">Concerns</h3>
                   <div style={{ flex: 1, overflowY: "auto" }}>
@@ -357,10 +439,17 @@ const Home = () => {
             </div>
 
             <div className="col-md-7 col-sm-12">
-              <a href="/reservations" style={{ textDecoration: "none", color: "inherit" }}>
+              <a
+                href="/reservations"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 <div
                   className="p-3 bg-white shadow rounded"
-                  style={{ height: "500px", display: "flex", flexDirection: "column" }}
+                  style={{
+                    height: "500px",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
                 >
                   <h3 className="fs-5 mb-3">Reservations</h3>
                   <div style={{ flex: 1, overflowY: "auto" }}>
@@ -387,13 +476,17 @@ const Home = () => {
                             <td>{reservation.status}</td>
                             <td>
                               <button
-                                onClick={() => acceptReservation(reservation.reservation_id)}
+                                onClick={() =>
+                                  acceptReservation(reservation.reservation_id)
+                                }
                                 className="btn btn-success btn-sm"
                               >
                                 Accept
                               </button>
                               <button
-                                onClick={() => rejectReservation(reservation.reservation_id)}
+                                onClick={() =>
+                                  rejectReservation(reservation.reservation_id)
+                                }
                                 className="btn btn-danger btn-sm"
                               >
                                 Reject
@@ -407,6 +500,14 @@ const Home = () => {
                 </div>
               </a>
             </div>
+          </div>
+          <div className="text-center mt-4">
+            <button
+              className="btn btn-primary download-pdf-btn"
+              onClick={generatePDF}
+            >
+              Download PDF
+            </button>
           </div>
         </div>
       </div>
