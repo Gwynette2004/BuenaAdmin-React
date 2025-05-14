@@ -21,56 +21,57 @@ const Login = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const onLogin = async (data) => {
-    try {
-      const response = await CompileService.userLogin(data);
+const onLogin = async (data) => {
+  try {
+    const response = await CompileService.userLogin(data);
 
-      // Check if the response contains an archived user message
-      if (response.message === "This account is archived and cannot log in.") {
-        Swal.fire({
-          title: "Account Archived",
-          text: "Your account has been archived and cannot log in.",
-          icon: "error",
-          confirmButtonText: "Okay",
-        });
-        return; // Exit early to prevent further actions
-      }
-
-      // Show success message for login
+    if (response.message === "This account is archived and cannot log in.") {
       Swal.fire({
-        title: "Success",
-        text: "Welcome Admin!",
-        icon: "success",
-        confirmButtonText: "Great!",
-        position: "top-end",
-        toast: true,
-        timer: 2000,
-        showConfirmButton: false,
+        title: "Account Archived",
+        text: "Your account has been archived and cannot log in.",
+        icon: "error",
+        confirmButtonText: "Okay",
       });
-
-      // Store the JWT token and navigate
-      CompileService.setToken(response.jwt);
-      navigate("/home");
-      setLoginError(false);
-    } catch (error) {
-      // Handle error, including for archived users
-      setErrorMessage(error.message || "Invalid email or password.");
-      setLoginError(true);
-
-      // If the error is due to an archived account, handle it here
-      if (
-        error.status === 403 &&
-        error.error?.message === "This account is archived and cannot log in."
-      ) {
-        Swal.fire({
-          title: "Account Archived",
-          text: "Your account is archived and cannot log in.",
-          icon: "error",
-          confirmButtonText: "Okay",
-        });
-      }
+      return; // Exit early to prevent further actions
     }
-  };
+
+    // Show success message for login
+    Swal.fire({
+      title: "Success",
+      text: "Welcome Admin!",
+      icon: "success",
+      confirmButtonText: "Great!",
+      position: "top-end",
+      toast: true,
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    // Store the JWT token in localStorage with the correct key
+    localStorage.setItem("jwt_token", response.jwt);
+    console.log("Token saved in localStorage:", localStorage.getItem("jwt_token")); // Debugging log
+
+    // Navigate to the home page
+    navigate("/home");
+    setLoginError(false);
+  } catch (error) {
+    setErrorMessage(error.message || "Invalid email or password.");
+    setLoginError(true);
+
+    // Handle archived account error
+    if (
+      error.status === 403 &&
+      error.error?.message === "This account is archived and cannot log in."
+    ) {
+      Swal.fire({
+        title: "Account Archived",
+        text: "Your account is archived and cannot log in.",
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+    }
+  }
+};
 
 
 

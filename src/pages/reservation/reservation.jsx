@@ -9,7 +9,7 @@ const Reservation = () => {
   const [reservations, setReservations] = useState([]);
   const [filteredReservations, setFilteredReservations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedVenue, setSelectedVenue] = useState("Hall");
+  const [selectedVenue, setSelectedVenue] = useState("All"); // Default to "All"
   const [rejectionReason, setRejectionReason] = useState("");
   const [selectedReservationId, setSelectedReservationId] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -26,7 +26,7 @@ const Reservation = () => {
       );
       if (response.data && response.data.data) {
         setReservations(response.data.data);
-        applyFilters();
+        setFilteredReservations(response.data.data); // Display all reservations by default
       }
     } catch (error) {
       console.error("Error fetching reservations:", error);
@@ -35,7 +35,11 @@ const Reservation = () => {
 
   const filterByVenue = (venue) => {
     setSelectedVenue(venue);
-    applyFilters();
+    if (venue === "All") {
+      setFilteredReservations(reservations); // Show all reservations
+    } else {
+      applyFilters();
+    }
   };
 
   const applyFilters = () => {
@@ -43,7 +47,8 @@ const Reservation = () => {
     setFilteredReservations(
       reservations.filter(
         (reservation) =>
-          reservation.facility_name === selectedVenue &&
+          (selectedVenue === "All" ||
+            reservation.facility_name === selectedVenue) &&
           (reservation.facility_name.toLowerCase().includes(term) ||
             reservation.content.toLowerCase().includes(term))
       )
@@ -74,7 +79,9 @@ const Reservation = () => {
       }
     } catch (error) {
       console.error("Error accepting reservation:", error);
-      alert(`Error: ${error.response?.data?.message || "An unexpected error occurred"}`);
+      alert(
+        `Error: ${error.response?.data?.message || "An unexpected error occurred"}`
+      );
     }
   };
 
@@ -140,11 +147,14 @@ const Reservation = () => {
 
   const sendNotification = async (userId, description, type) => {
     try {
-      await axios.post(`http://localhost/BuenaHub/api/notifications/${userId}`, {
-        user_id: userId,
-        description,
-        notification_type: type,
-      });
+      await axios.post(
+        `http://localhost/BuenaHub/api/notifications/${userId}`,
+        {
+          user_id: userId,
+          description,
+          notification_type: type,
+        }
+      );
       console.log("Notification sent successfully");
     } catch (error) {
       console.error("Error sending notification:", error);
@@ -154,35 +164,65 @@ const Reservation = () => {
   return (
     <div className="d-flex" id="wrapper">
       {/* Sidebar */}
-      <div className="bg-white" id="sidebar-wrapper" style={{ position: "fixed", height: "100vh", width: "250px" }}>
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">BuenaVista</div>
+      <div
+        className="bg-white"
+        id="sidebar-wrapper"
+        style={{ position: "fixed", height: "100vh", width: "250px" }}
+      >
+        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">
+          BuenaVista
+        </div>
         <div className="list-group list-group-flush my-1">
-          <a href="/home" className="list-group-item list-group-item-action bg-transparent second-text active">
+          <a
+            href="/home"
+            className="list-group-item list-group-item-action bg-transparent second-text active"
+          >
             <i className="fas fa-tachometer-alt me-2"></i>Dashboard
           </a>
-          <a href="/invoice" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
+          <a
+            href="/invoice"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
             <i className="bx bxs-file me-2"></i>Invoice
           </a>
-          <a href="/residents" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
+          <a
+            href="/residents"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
             <i className="bx bx-male-female me-2"></i>Residents
           </a>
-          <a href="/concerns" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
+          <a
+            href="/concerns"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
             <i className="bx bxs-bell-ring me-2"></i>Concerns
           </a>
-          <a href="/reservations" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
+          <a
+            href="/reservations"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
             <i className="bx bxs-bookmark-star me-2"></i>Reservations
           </a>
-          <a href="#" className="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
+          <a
+            href="#"
+            className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
+          >
             <i className="fas fa-power-off me-2"></i>Logout
           </a>
         </div>
       </div>
 
       {/* Page Content */}
-      <div id="page-content-wrapper" style={{ marginLeft: "250px", width: "calc(100% - 250px)" }}>
+      <div
+        id="page-content-wrapper"
+        style={{ marginLeft: "250px", width: "calc(100% - 250px)" }}
+      >
         <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
           <div className="d-flex align-items-center">
-            <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
+            <i
+              className="fas fa-align-left primary-text fs-4 me-3"
+              id="menu-toggle"
+            ></i>
             <h2 className="fs-2 m-0">Reservations</h2>
           </div>
         </nav>
@@ -191,8 +231,12 @@ const Reservation = () => {
           {/* Venue Selector */}
           <div className="row my-4">
             <div className="col-md-12 text-center">
-              <div className="btn-group w-50" role="group" aria-label="Venue Selector">
-                {["Hall", "Court", "Pool"].map((venue) => (
+              <div
+                className="btn-group w-50"
+                role="group"
+                aria-label="Venue Selector"
+              >
+                {["All", "Hall", "Court", "Pool"].map((venue) => (
                   <button
                     key={venue}
                     type="button"
@@ -230,13 +274,13 @@ const Reservation = () => {
                       <table className="table table-hover mb-0">
                         <thead>
                           <tr>
-                            <th style={{ width: '8%' }}>ID</th>
-                            <th style={{ width: '12%' }}>Facility</th>
-                            <th style={{ width: '15%' }}>Date</th>
-                            <th style={{ width: '12%' }}>Time</th>
-                            <th style={{ width: '28%' }}>Content</th>
-                            <th style={{ width: '10%' }}>Status</th>
-                            <th style={{ width: '15%' }}>Action</th>
+                            <th style={{ width: "8%" }}>ID</th>
+                            <th style={{ width: "12%" }}>Facility</th>
+                            <th style={{ width: "15%" }}>Date</th>
+                            <th style={{ width: "12%" }}>Time</th>
+                            <th style={{ width: "28%" }}>Content</th>
+                            <th style={{ width: "10%" }}>Status</th>
+                            <th style={{ width: "15%" }}>Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -244,11 +288,17 @@ const Reservation = () => {
                             <tr key={reservation.reservation_id}>
                               <td>#{reservation.reservation_id}</td>
                               <td>{reservation.facility_name}</td>
-                              <td>{new Date(reservation.reservation_date).toLocaleDateString()}</td>
+                              <td>
+                                {new Date(
+                                  reservation.reservation_date
+                                ).toLocaleDateString()}
+                              </td>
                               <td>{reservation.reservation_time}</td>
                               <td>{reservation.content}</td>
                               <td>
-                                <span className={`status-badge status-${reservation.status.toLowerCase()}`}>
+                                <span
+                                  className={`status-badge status-${reservation.status.toLowerCase()}`}
+                                >
                                   {reservation.status}
                                 </span>
                               </td>
@@ -256,14 +306,24 @@ const Reservation = () => {
                                 <div className="d-flex gap-2">
                                   <button
                                     className="btn btn-success btn-sm px-3"
-                                    onClick={() => acceptReservation(reservation.reservation_id, reservation.user_id)}
+                                    onClick={() =>
+                                      acceptReservation(
+                                        reservation.reservation_id,
+                                        reservation.user_id
+                                      )
+                                    }
                                   >
                                     <i className="bx bx-check me-1"></i>
                                     Accept
                                   </button>
                                   <button
                                     className="btn btn-danger btn-sm px-3"
-                                    onClick={() => openRejectModal(reservation.reservation_id, reservation.user_id)}
+                                    onClick={() =>
+                                      openRejectModal(
+                                        reservation.reservation_id,
+                                        reservation.user_id
+                                      )
+                                    }
                                   >
                                     <i className="bx bx-x me-1"></i>
                                     Reject

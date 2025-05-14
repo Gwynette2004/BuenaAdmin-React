@@ -228,7 +228,7 @@ const Invoice = () => {
     <div className="d-flex" id="wrapper">
       {/* Sidebar */}
       <div className="bg-white" id="sidebar-wrapper" style={{ position: 'fixed', height: '100vh', width: 250 }}>
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">BuenaVista</div>
+        <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">BuenaVista</div>
         <div className="list-group list-group-flush my-1">
           <a href="/home" className="list-group-item list-group-item-action bg-transparent second-text active">
             <i className="fas fa-tachometer-alt me-2"></i>Dashboard
@@ -251,7 +251,7 @@ const Invoice = () => {
         </div>
       </div>
       <div id="page-content-wrapper" style={{ marginLeft: 250, width: 'calc(100% - 250px)' }}>
-        <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+        <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4 mb-10">
           <div className="d-flex align-items-center">
             <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
             <h2 className="fs-2 m-0">Invoice</h2>
@@ -266,7 +266,7 @@ const Invoice = () => {
                 <div className="card-body">
                   <h6 className="text-muted mb-2">Total Bills</h6>
                   <div className="d-flex align-items-center">
-                    <i className='bx bx-file fs-1 text-primary'></i>
+                    <i className='bx bx-file fs-1 text-success'></i>
                     <h3 className="ms-2 mb-0">{allBill.length}</h3>
                   </div>
                 </div>
@@ -282,11 +282,12 @@ const Invoice = () => {
                   </div>
                 </div>
                 <div className="card-body">
-                  <div className="row g-3">
+                  <div className="row g-3 mb-1
+                  ">
                     {['electric', 'water', 'cusa', 'payment'].map(type => (
                       <div className="col-12 col-sm-6 col-lg-3" key={type}>
                         <button
-                          className={`btn w-100 ${selectedBill === type ? 'btn-primary' : 'btn-outline-primary'}`}
+                          className={`btn w-100 ${selectedBill === type ? 'btn-success' : 'btn-outline-success'}`}
                           onClick={() => showTable(type)}
                         >
                           <i className={`bx bx-${type === 'electric' ? 'bulb' : type === 'water' ? 'water' : type === 'cusa' ? 'building-house' : 'credit-card'} me-2`}></i>
@@ -330,7 +331,7 @@ const Invoice = () => {
                                 <td>#{user.user_id}</td>
                                 <td>
                                   <div className="d-flex align-items-center">
-                                    <div className="avatar-circle bg-primary text-white me-2">
+                                    <div className="avatar-circle bg-success text-white me-2">
                                       {user.fullname.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
@@ -342,7 +343,7 @@ const Invoice = () => {
                                 <td className="d-none d-md-table-cell">{user.email}</td>
                                 <td>
                                   <button 
-                                    className="btn btn-primary btn-sm px-3"
+                                    className="btn btn-success btn-sm px-3"
                                     onClick={() => openUploadModal(user)}
                                   >
                                     <i className="bx bx-upload me-1"></i>
@@ -368,7 +369,7 @@ const Invoice = () => {
               <div className="card border-0 shadow-sm">
                 <div className="card-header bg-white py-3">
                   <div className="d-flex flex-wrap justify-content-between align-items-center">
-                    <h5 className="card-title mb-0">Bills List</h5>
+                    <h5 className="card-title mb-0 fw-bold">Bills List</h5>
                     <div className="d-flex gap-2 flex-wrap">
                       <select
                         className="form-select form-select-sm"
@@ -427,7 +428,7 @@ const Invoice = () => {
                               <td>#{bill.bill_id}</td>
                               <td>
                                 <div className="d-flex align-items-center">
-                                  <div className="avatar-circle bg-primary text-white me-2">
+                                  <div className="avatar-circle bg-succcess text-white me-2">
                                     {bill.fullname.charAt(0).toUpperCase()}
                                   </div>
                                   <div>
@@ -444,7 +445,7 @@ const Invoice = () => {
                               </td>
                               <td>
                                 <button 
-                                  className="btn btn-primary btn-sm px-3"
+                                  className="btn btn-success btn-sm px-3"
                                   onClick={() => payment(bill)}
                                 >
                                   <i className="bx bx-show me-1"></i>

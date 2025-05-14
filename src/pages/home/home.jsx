@@ -13,10 +13,12 @@ import {
   ArcElement,
 } from "chart.js";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
-import autoTable from "jspdf-autotable";
+import "jspdf-autotable";
 import "./home.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
+
 
 // Register Chart.js components
 ChartJS.register(
@@ -28,14 +30,6 @@ ChartJS.register(
   Legend,
   ArcElement
 );
-
-// Add this helper function at the top of your component
-const isCurrentMonth = (dateString) => {
-  const date = new Date(dateString);
-  const now = new Date();
-  return date.getMonth() === now.getMonth() && 
-         date.getFullYear() === now.getFullYear();
-};
 
 const Home = () => {
   const [userCount, setUserCount] = useState(0);
@@ -51,6 +45,7 @@ const Home = () => {
     labels: [],
     datasets: [],
   });
+  const [selectedMonth, setSelectedMonth] = useState("Yearly");
 
   const userId = CompileService.getUserId();
 
@@ -62,7 +57,11 @@ const Home = () => {
     } else {
       console.error("User ID not found. Please log in.");
     }
-  }, [userId]);
+  }, [userId, selectedMonth]);
+
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
+  };
 
   const retrieveConcerns = async () => {
     try {
@@ -71,39 +70,38 @@ const Home = () => {
       );
       const data = await response.json();
       if (data && data.data) {
-        // Filter for current month only
-        const currentMonthData = data.data
-          .filter(concern => isCurrentMonth(concern.created_at))
+        const sortedConcerns = data.data
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-          .map(concern => ({
+          .map((concern) => ({
             ...concern,
-            content: concern.content.length > 50 
-              ? concern.content.substring(0, 50) + "..." 
-              : concern.content,
+            content:
+              concern.content.length > 50
+                ? concern.content.substring(0, 50) + "..."
+                : concern.content,
           }));
+        setConcerns(sortedConcerns.slice(0, 5));
 
-        setConcerns(currentMonthData);
-
-        // Update pie chart with current month data
         const categoryCounts = { Security: 0, Maintenance: 0, Others: 0 };
-        currentMonthData.forEach(concern => {
-          if (concern.concern.toLowerCase().includes("security")) 
+        sortedConcerns.forEach((concern) => {
+          if (concern.concern.toLowerCase().includes("security"))
             categoryCounts.Security++;
-          else if (concern.concern.toLowerCase().includes("maintenance")) 
+          else if (concern.concern.toLowerCase().includes("maintenance"))
             categoryCounts.Maintenance++;
           else categoryCounts.Others++;
         });
 
         setPieChartData({
           labels: ["Security", "Maintenance", "Others"],
-          datasets: [{
-            data: [
-              categoryCounts.Security,
-              categoryCounts.Maintenance,
-              categoryCounts.Others
-            ],
-            backgroundColor: ["#d6cda4", "#393e46", "#3d8361"],
-          }],
+          datasets: [
+            {
+              data: [
+                categoryCounts.Security,
+                categoryCounts.Maintenance,
+                categoryCounts.Others,
+              ],
+              backgroundColor: ["#d6cda4", "#393e46", "#3d8361"],
+            },
+          ],
         });
       }
     } catch (error) {
@@ -118,16 +116,21 @@ const Home = () => {
       );
       const data = await response.json();
       if (data && data.data) {
-        // Filter for current month only
-        const currentMonthData = data.data.filter(reservation => 
-          isCurrentMonth(reservation.reservation_date)
-        );
-        setReservations(currentMonthData);
+        const filteredReservations =
+          selectedMonth === "Yearly"
+            ? data.data
+            : data.data.filter(
+                (reservation) =>
+                  new Date(reservation.reservation_date).getMonth() ===
+                  parseInt(selectedMonth)
+              );
+        setReservations(filteredReservations);
 
-        // Update bar chart to show only current month
-        const currentMonth = new Date().getMonth();
         const monthlyCounts = Array(12).fill(0);
-        monthlyCounts[currentMonth] = currentMonthData.length;
+        data.data.forEach((reservation) => {
+          const month = new Date(reservation.reservation_date).getMonth();
+          monthlyCounts[month]++;
+        });
 
         setBarChartData({
           labels: [
@@ -147,7 +150,12 @@ const Home = () => {
           datasets: [
             {
               label: "Reservations",
-              data: monthlyCounts,
+              data:
+                selectedMonth === "Yearly"
+                  ? monthlyCounts
+                  : monthlyCounts.map((count, index) =>
+                      index === parseInt(selectedMonth) ? count : 0
+                    ),
               backgroundColor: "#668678",
             },
           ],
@@ -213,87 +221,81 @@ const Home = () => {
     }
   };
 
-  const generatePDF = async () => {
-    const doc = new jsPDF("p", "mm", "a4");
-    const currentDate = new Date();
-    const monthName = currentDate.toLocaleString('default', { month: 'long' });
-    const year = currentDate.getFullYear();
+const generatePDF = () => {
+  const doc = new jsPDF();
 
-    // Filter data for current month
-    const currentMonthConcerns = concerns.filter(concern => 
-      isCurrentMonth(concern.created_at)
-    );
-    const currentMonthReservations = reservations.filter(reservation => 
-      isCurrentMonth(reservation.reservation_date)
-    );
+  // Set a green theme color
+  const themeColor = "#3d8361";
 
-    // Add Header
-    doc.setFontSize(18);
-    doc.setTextColor("#4a6c5e");
-    doc.text(`Dashboard Report - ${monthName} ${year}`, 10, 10);
-    doc.setFontSize(12);
-    doc.setTextColor("#000");
-    doc.text(`Generated on: ${currentDate.toLocaleDateString()}`, 10, 20);
+  // Add a title to the PDF
+  doc.setFontSize(22);
+  doc.setTextColor(themeColor);
+  doc.text("Dashboard Report", 14, 20);
 
-    // Add Monthly Stats
-    doc.setFontSize(14);
-    doc.setTextColor("#4a6c5e");
-    doc.text("Monthly Summary", 10, 30);
-    doc.setFontSize(12);
-    doc.setTextColor("#000");
-    doc.text(`Total Residents: ${userCount}`, 10, 40);
-    doc.text(`${monthName} Concerns: ${currentMonthConcerns.length}`, 10, 50);
-    doc.text(`${monthName} Reservations: ${currentMonthReservations.length}`, 10, 60);
+  // Add a horizontal line under the title
+  doc.setDrawColor(themeColor);
+  doc.setLineWidth(0.5);
+  doc.line(14, 25, 200, 25);
 
-    // Add Current Month's Concerns Table
-    autoTable(doc, {
-      startY: 70,
+  // Add user stats with a green theme
+  doc.setFontSize(12);
+  doc.setTextColor(0); // Black text
+  doc.text(`Residents:`, 14, 35);
+  doc.setTextColor(themeColor);
+  doc.text(`${userCount}`, 50, 35);
+
+  doc.setTextColor(0);
+  doc.text(`Concerns:`, 14, 42);
+  doc.setTextColor(themeColor);
+  doc.text(`${concernCount}`, 50, 42);
+
+  doc.setTextColor(0);
+  doc.text(`Reservations:`, 14, 49);
+  doc.setTextColor(themeColor);
+  doc.text(`${reservationCount}`, 50, 49);
+
+  // Add concerns table
+  if (concerns.length > 0) {
+    doc.setTextColor(0); // Black text
+    doc.text("Concerns", 14, 60);
+    doc.autoTable({
+      startY: 65,
       head: [["Name", "Email", "Concern", "Date"]],
-      body: currentMonthConcerns.map((concern) => [
+      body: concerns.map((concern) => [
         concern.name,
         concern.email,
-        concern.concern,
-        new Date(concern.created_at).toLocaleDateString()
+        concern.content,
+        concern.created_at,
       ]),
-      theme: "grid",
-      headStyles: { fillColor: "#4a6c5e" },
-      styles: { fontSize: 10 },
+      headStyles: { fillColor: themeColor, textColor: "#ffffff" },
+      bodyStyles: { textColor: 0 },
     });
+  }
 
-    // Add Current Month's Reservations Table
-    autoTable(doc, {
-      startY: doc.lastAutoTable.finalY + 10,
+  // Add reservations table
+  if (reservations.length > 0) {
+    const startY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 10 : 70;
+    doc.setTextColor(0); // Black text
+    doc.text("Reservations", 14, startY);
+    doc.autoTable({
+      startY: startY + 5,
       head: [["ID", "Facility", "Date", "Time", "Content", "Status"]],
-      body: currentMonthReservations.map((reservation) => [
+      body: reservations.map((reservation) => [
         reservation.reservation_id,
         reservation.facility_name,
-        new Date(reservation.reservation_date).toLocaleDateString(),
+        reservation.reservation_date,
         reservation.reservation_time,
         reservation.content,
         reservation.status,
       ]),
-      theme: "grid",
-      headStyles: { fillColor: "#4a6c5e" },
-      styles: { fontSize: 10 },
+      headStyles: { fillColor: themeColor, textColor: "#ffffff" },
+      bodyStyles: { textColor: 0 },
     });
+  }
 
-    // Add Footer with month/year
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(10);
-      doc.setTextColor("#888");
-      doc.text(
-        `${monthName} ${year} Report - Page ${i} of ${pageCount}`,
-        doc.internal.pageSize.width - 20,
-        doc.internal.pageSize.height - 10,
-        { align: "right" }
-      );
-    }
-
-    // Save the PDF with month in filename
-    doc.save(`dashboard_report_${monthName.toLowerCase()}_${year}.pdf`);
-  };
+  // Save the PDF
+  doc.save("dashboard_report.pdf");
+};
 
   return (
     <div className="d-flex" id="wrapper">
@@ -351,7 +353,7 @@ const Home = () => {
         id="page-content-wrapper"
         style={{ marginLeft: "250px", width: "calc(100% - 250px)" }}
       >
-        <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+        <nav className="navbar navbar-expand-lg navbar-light bg-transparent mb-20 mt-2 px-4">
           <div className="d-flex align-items-center">
             <i
               className="fas fa-align-left primary-text fs-4 me-3"
@@ -362,10 +364,41 @@ const Home = () => {
         </nav>
 
         <div className="container-fluid px-4">
-          <link
-            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-            rel="stylesheet"
-          />
+          <div className="row mb-4">
+            <div className="col-auto">
+              <select
+                className="form-select"
+                value={selectedMonth}
+                onChange={handleMonthChange}
+              >
+                <option value="Yearly">Yearly</option>
+                {[
+                  "January",
+                  "February",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                  "July",
+                  "August",
+                  "September",
+                  "October",
+                  "November",
+                  "December",
+                ].map((month, index) => (
+                  <option key={index} value={index}>
+                    {month}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-auto">
+              <button className="btn btn-primary" onClick={generatePDF}>
+                Generate PDF
+              </button>
+            </div>
+          </div>
+
           <div className="row justify-content-center my-4">
             <div className="col-12 col-sm-6 col-lg-4 p-2">
               <div className="box shadow p-4 bg-white d-flex justify-content-around align-items-center rounded">
@@ -523,14 +556,6 @@ const Home = () => {
                 </div>
               </a>
             </div>
-          </div>
-          <div className="text-center mt-4">
-            <button
-              className="btn btn-primary download-pdf-btn"
-              onClick={generatePDF}
-            >
-              Download PDF
-            </button>
           </div>
         </div>
       </div>

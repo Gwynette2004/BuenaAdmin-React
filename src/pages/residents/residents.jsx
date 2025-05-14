@@ -247,8 +247,8 @@ const Residents = () => {
     <div className="d-flex" id="wrapper">
       {/* Sidebar */}
       <div className="bg-white shadow-sm sidebar" id="sidebar-wrapper">
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold text-primary border-bottom">
-          <i className='bx bxs-building-house me-2'></i>BuenaVista
+        <div className="sidebar-heading text-center py-4 text-success fs-5 fw-bold text-primary border-bottom">
+          BuenaVista
         </div>
         <div className="list-group list-group-flush my-3">
           <a href="/home" className="list-group-item list-group-item-action bg-transparent second-text active">
@@ -282,11 +282,11 @@ const Residents = () => {
           <div className="row g-4">
             {/* Stats Cards */}
             <div className="col-12 col-md-6 col-xl-3">
-              <div className="card border-0 shadow-sm">
+              <div className="card border-0 mt-20 shadow-sm">
                 <div className="card-body">
                   <h6 className="text-muted mb-2">Total Residents</h6>
                   <div className="d-flex align-items-center">
-                    <i className='bx bx-user-circle fs-1 text-primary'></i>
+                    <i className='bx bx-user-circle fs-1 text-success'></i>
                     <h3 className="ms-2 mb-0">{users.length}</h3>
                   </div>
                 </div>
@@ -294,11 +294,11 @@ const Residents = () => {
             </div>
 
             <div className="col-12 col-md-6 col-xl-3">
-              <div className="card border-0 shadow-sm">
+              <div className="card border-0 mt-20 shadow-sm">
                 <div className="card-body">
                   <h6 className="text-muted mb-2">Archived Users</h6>
                   <div className="d-flex align-items-center">
-                    <i className='bx bx-archive fs-1 text-warning'></i>
+                    <i className='bx bx-archive fs-1 text-success'></i>
                     <h3 className="ms-2 mb-0">{archivedUsers.length}</h3>
                   </div>
                 </div>
