@@ -25,6 +25,7 @@ const Invoice = () => {
   const [years, setYears] = useState([]);
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [selectedBillImage, setSelectedBillImage] = useState('');
+  const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     retrieveUsers();
@@ -125,40 +126,66 @@ const Invoice = () => {
 
   const submitBillForm = async (e) => {
     e.preventDefault();
-    if (!selectedUser) {
-      alert('User ID is required.');
-      return;
-    }
-    if (!selectedBill) {
-      alert('Please select a bill type.');
-      return;
-    }
-    if (!uploadedFile) {
-      alert('Please upload a file.');
-      return;
-    }
-    const formData = new FormData();
-    formData.append('user_id', String(selectedUser.user_id));
-    formData.append('bill_type', selectedBill);
-    formData.append('payment_img', uploadedFile, uploadedFile.name);
-
-    try {
-      await axios.post('http://localhost/BuenaHub/api/billing', formData);
+    
+    if (!selectedUser || !selectedBill || !uploadedFile) {
       Swal.fire({
-        title: 'Success',
-        text: 'Bill has been sent',
-        icon: 'success',
-        position: 'center',
+        title: 'Error',
+        text: 'Please fill in all required fields',
+        icon: 'error',
         toast: true,
-        timer: 2000,
-        showConfirmButton: false,
+        position: 'top-end',
+        timer: 3000,
+        showConfirmButton: false
       });
-      closeModal();
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('user_id', selectedUser.user_id);
+    formData.append('bill_type', selectedBill);
+    formData.append('payment_img', uploadedFile);
+  
+    try {
+      // Upload the bill
+      const response = await axios.post('http://localhost/BuenaHub/api/billing', formData);
+      
+      if (response.data) {
+        // Send notification to user
+        await sendNotification(
+          selectedUser.user_id,
+          `A new ${selectedBill} bill has been uploaded for your review.`,
+          'Billing'
+        );
+  
+        // Show success message
+        Swal.fire({
+          title: 'Success',
+          text: 'Bill uploaded and notification sent',
+          icon: 'success',
+          toast: true,
+          position: 'top-end',
+          timer: 2000,
+          showConfirmButton: false
+        });
+  
+        // Reset form and refresh data
+        closeModal();
+        allBills();
+      }
     } catch (error) {
-      console.error('Upload Error:', error);
-      alert('Error uploading file. Please try again.');
+      console.error('Error:', error);
+      Swal.fire({
+        title: 'Error',
+        text: error.response?.data?.message || 'Failed to upload bill',
+        icon: 'error',
+        toast: true,
+        position: 'top-end',
+        timer: 3000,
+        showConfirmButton: false
+      });
     }
   };
+  
 
   const payment = (bill) => {
     setSelectedBillImage(bill.payment_img);
@@ -180,6 +207,22 @@ const Invoice = () => {
       };
     }
   }, []);
+
+
+
+  // Add this function after your existing functions
+  const sendNotification = async (userId, description, type) => {
+    try {
+      await axios.post(`http://localhost/BuenaHub/api/notifications/${userId}`, {
+        user_id: userId,
+        description,
+        notification_type: type,
+      });
+      console.log("Notification sent successfully");
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
 
   return (
     <div className="d-flex" id="wrapper">
