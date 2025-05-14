@@ -213,23 +213,11 @@ const Invoice = () => {
             <i className="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
             <h2 className="fs-2 m-0">Invoice</h2>
           </div>
-          <div className="ms-auto d-flex align-items-center">
-            <div className="search-box">
-              <i className="bx bx-search-alt-2"></i>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Search here..."
-                value={searchTerm}
-                onChange={e => { setSearchTerm(e.target.value); applySearchFilter(); }}
-              />
-            </div>
-          </div>
         </nav>
 
         <div className="container-fluid px-4 py-4">
           <div className="row g-4">
-            {/* Stats Cards */}
+            {/* Stats Card */}
             <div className="col-12 col-md-6 col-xl-3">
               <div className="card border-0 shadow-sm">
                 <div className="card-body">
@@ -242,10 +230,10 @@ const Invoice = () => {
               </div>
             </div>
 
-            {/* Bill Type Buttons */}
+            {/* Bill Categories */}
             <div className="col-12">
               <div className="card border-0 shadow-sm">
-                <div className="card-header bg-white py-3">
+                <div className="card-header bg-white">
                   <div className="d-flex flex-wrap justify-content-between align-items-center">
                     <h5 className="card-title mb-0">Bill Categories</h5>
                   </div>
@@ -264,86 +252,20 @@ const Invoice = () => {
                       </div>
                     ))}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Filters Section */}
-            <div className="col-12">
-              <div className="card border-0 shadow-sm">
-                <div className="card-header bg-white py-3">
-                  <div className="d-flex flex-wrap justify-content-between align-items-center">
-                    <h5 className="card-title mb-0">Filter Bills</h5>
-                  </div>
-                </div>
-                <div className="card-body">
-                  <div className="row g-3">
-                    <div className="col-12 col-md-4">
-                      <label htmlFor="monthSelect" className="form-label">Month</label>
-                      <select
-                        id="monthSelect"
-                        className="form-select"
-                        value={selectedMonth}
-                        onChange={e => setSelectedMonth(e.target.value)}
-                      >
-                        <option value="">All Months</option>
-                        {months.map(month => (
-                          <option key={month} value={month}>{month}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-12 col-md-4">
-                      <label htmlFor="yearSelect" className="form-label">Year</label>
-                      <select
-                        id="yearSelect"
-                        className="form-select"
-                        value={selectedYear}
-                        onChange={e => setSelectedYear(e.target.value)}
-                      >
-                        <option value="">All Years</option>
-                        {years.map(year => (
-                          <option key={year} value={year}>{year}</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="col-12 col-md-4">
-                      <label htmlFor="billTypeSelect" className="form-label">Bill Type</label>
-                      <select
-                        id="billTypeSelect"
-                        className="form-select"
-                        value={selectedBillType}
-                        onChange={e => setSelectedBillType(e.target.value)}
-                      >
-                        <option value="">All Types</option>
-                        {billTypes.map(billType => (
-                          <option key={billType} value={billType}>
-                            {billType.charAt(0).toUpperCase() + billType.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Users Table */}
-            {displayTable && (
+                  {displayTable && (
               <div className="col-12">
                 <div className="card border-0 shadow-sm">
-                  <div className="card-header bg-white py-3">
+                  <div className="card-header bg-white">
                     <div className="d-flex flex-wrap justify-content-between align-items-center">
                       <h5 className="card-title mb-0">User List</h5>
-                      <div className="d-flex gap-2">
-                        <div className="search-box">
-                          <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Search users..."
-                            value={searchTerm}
-                            onChange={e => { setSearchTerm(e.target.value); applySearchFilter(); }}
-                          />
-                        </div>
+                      <div className="search-box">
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="Search users..."
+                          value={searchTerm}
+                          onChange={e => { setSearchTerm(e.target.value); applySearchFilter(); }}
+                        />
                       </div>
                     </div>
                   </div>
@@ -394,13 +316,53 @@ const Invoice = () => {
                 </div>
               </div>
             )}
+                </div>
+              </div>
+            </div>
 
-            {/* Bills Table */}
+            {/* Bills List with Integrated Filters */}
             <div className="col-12">
               <div className="card border-0 shadow-sm">
                 <div className="card-header bg-white py-3">
                   <div className="d-flex flex-wrap justify-content-between align-items-center">
                     <h5 className="card-title mb-0">Bills List</h5>
+                    <div className="d-flex gap-2 flex-wrap">
+                      <select
+                        className="form-select form-select-sm"
+                        value={selectedMonth}
+                        onChange={e => setSelectedMonth(e.target.value)}
+                        style={{ width: 'auto' }}
+                      >
+                        <option value="">All Months</option>
+                        {months.map(month => (
+                          <option key={month} value={month}>{month}</option>
+                        ))}
+                      </select>
+                      <select
+                        className="form-select form-select-sm"
+                        value={selectedYear}
+                        onChange={e => setSelectedYear(e.target.value)}
+                        style={{ width: 'auto' }}
+                      >
+                        <option value="">All Years</option>
+                        {years.map(year => (
+                          <option key={year} value={year}>{year}</option>
+                        ))}
+                      </select>
+                      <select
+                        className="form-select form-select-sm"
+                        value={selectedBillType}
+                        onChange={e => setSelectedBillType(e.target.value)}
+                        style={{ width: 'auto' }}
+                      >
+                        <option value="">All Types</option>
+                        {billTypes.map(billType => (
+                          <option key={billType} value={billType}>
+                            {billType.charAt(0).toUpperCase() + billType.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div className="card-body p-0">
@@ -455,6 +417,9 @@ const Invoice = () => {
                 </div>
               </div>
             </div>
+
+            {/* Users Table (only shown when category is selected) */}
+            
           </div>
         </div>
 

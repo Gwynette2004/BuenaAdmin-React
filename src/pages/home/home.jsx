@@ -29,6 +29,14 @@ ChartJS.register(
   ArcElement
 );
 
+// Add this helper function at the top of your component
+const isCurrentMonth = (dateString) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  return date.getMonth() === now.getMonth() && 
+         date.getFullYear() === now.getFullYear();
+};
+
 const Home = () => {
   const [userCount, setUserCount] = useState(0);
   const [concernCount, setConcernCount] = useState(0);
@@ -63,38 +71,39 @@ const Home = () => {
       );
       const data = await response.json();
       if (data && data.data) {
-        const sortedConcerns = data.data
+        // Filter for current month only
+        const currentMonthData = data.data
+          .filter(concern => isCurrentMonth(concern.created_at))
           .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-          .map((concern) => ({
+          .map(concern => ({
             ...concern,
-            content:
-              concern.content.length > 50
-                ? concern.content.substring(0, 50) + "..."
-                : concern.content,
+            content: concern.content.length > 50 
+              ? concern.content.substring(0, 50) + "..." 
+              : concern.content,
           }));
-        setConcerns(sortedConcerns.slice(0, 5));
 
+        setConcerns(currentMonthData);
+
+        // Update pie chart with current month data
         const categoryCounts = { Security: 0, Maintenance: 0, Others: 0 };
-        sortedConcerns.forEach((concern) => {
-          if (concern.concern.toLowerCase().includes("security"))
+        currentMonthData.forEach(concern => {
+          if (concern.concern.toLowerCase().includes("security")) 
             categoryCounts.Security++;
-          else if (concern.concern.toLowerCase().includes("maintenance"))
+          else if (concern.concern.toLowerCase().includes("maintenance")) 
             categoryCounts.Maintenance++;
           else categoryCounts.Others++;
         });
 
         setPieChartData({
           labels: ["Security", "Maintenance", "Others"],
-          datasets: [
-            {
-              data: [
-                categoryCounts.Security,
-                categoryCounts.Maintenance,
-                categoryCounts.Others,
-              ],
-              backgroundColor: ["#d6cda4", "#393e46", "#3d8361"],
-            },
-          ],
+          datasets: [{
+            data: [
+              categoryCounts.Security,
+              categoryCounts.Maintenance,
+              categoryCounts.Others
+            ],
+            backgroundColor: ["#d6cda4", "#393e46", "#3d8361"],
+          }],
         });
       }
     } catch (error) {
@@ -109,13 +118,16 @@ const Home = () => {
       );
       const data = await response.json();
       if (data && data.data) {
-        setReservations(data.data);
+        // Filter for current month only
+        const currentMonthData = data.data.filter(reservation => 
+          isCurrentMonth(reservation.reservation_date)
+        );
+        setReservations(currentMonthData);
 
+        // Update bar chart to show only current month
+        const currentMonth = new Date().getMonth();
         const monthlyCounts = Array(12).fill(0);
-        data.data.forEach((reservation) => {
-          const month = new Date(reservation.reservation_date).getMonth();
-          monthlyCounts[month]++;
-        });
+        monthlyCounts[currentMonth] = currentMonthData.length;
 
         setBarChartData({
           labels: [
@@ -203,49 +215,59 @@ const Home = () => {
 
   const generatePDF = async () => {
     const doc = new jsPDF("p", "mm", "a4");
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = new Date();
+    const monthName = currentDate.toLocaleString('default', { month: 'long' });
+    const year = currentDate.getFullYear();
+
+    // Filter data for current month
+    const currentMonthConcerns = concerns.filter(concern => 
+      isCurrentMonth(concern.created_at)
+    );
+    const currentMonthReservations = reservations.filter(reservation => 
+      isCurrentMonth(reservation.reservation_date)
+    );
 
     // Add Header
     doc.setFontSize(18);
     doc.setTextColor("#4a6c5e");
-    doc.text("Dashboard Report", 10, 10);
+    doc.text(`Dashboard Report - ${monthName} ${year}`, 10, 10);
     doc.setFontSize(12);
     doc.setTextColor("#000");
-    doc.text(`Date: ${currentDate}`, 10, 20);
+    doc.text(`Generated on: ${currentDate.toLocaleDateString()}`, 10, 20);
 
-    // Add User Stats
+    // Add Monthly Stats
     doc.setFontSize(14);
     doc.setTextColor("#4a6c5e");
-    doc.text("Summary", 10, 30);
+    doc.text("Monthly Summary", 10, 30);
     doc.setFontSize(12);
     doc.setTextColor("#000");
-    doc.text(`Residents: ${userCount}`, 10, 40);
-    doc.text(`Concerns: ${concernCount}`, 10, 50);
-    doc.text(`Reservations: ${reservationCount}`, 10, 60);
+    doc.text(`Total Residents: ${userCount}`, 10, 40);
+    doc.text(`${monthName} Concerns: ${currentMonthConcerns.length}`, 10, 50);
+    doc.text(`${monthName} Reservations: ${currentMonthReservations.length}`, 10, 60);
 
-    // Add Concerns Table
+    // Add Current Month's Concerns Table
     autoTable(doc, {
       startY: 70,
       head: [["Name", "Email", "Concern", "Date"]],
-      body: concerns.map((concern) => [
+      body: currentMonthConcerns.map((concern) => [
         concern.name,
         concern.email,
         concern.concern,
-        concern.created_at,
+        new Date(concern.created_at).toLocaleDateString()
       ]),
       theme: "grid",
       headStyles: { fillColor: "#4a6c5e" },
       styles: { fontSize: 10 },
     });
 
-    // Add Reservations Table
+    // Add Current Month's Reservations Table
     autoTable(doc, {
       startY: doc.lastAutoTable.finalY + 10,
       head: [["ID", "Facility", "Date", "Time", "Content", "Status"]],
-      body: reservations.map((reservation) => [
+      body: currentMonthReservations.map((reservation) => [
         reservation.reservation_id,
         reservation.facility_name,
-        reservation.reservation_date,
+        new Date(reservation.reservation_date).toLocaleDateString(),
         reservation.reservation_time,
         reservation.content,
         reservation.status,
@@ -255,21 +277,22 @@ const Home = () => {
       styles: { fontSize: 10 },
     });
 
-    // Add Footer
+    // Add Footer with month/year
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(10);
       doc.setTextColor("#888");
       doc.text(
-        `Page ${i} of ${pageCount}`,
+        `${monthName} ${year} Report - Page ${i} of ${pageCount}`,
         doc.internal.pageSize.width - 20,
-        doc.internal.pageSize.height - 10
+        doc.internal.pageSize.height - 10,
+        { align: "right" }
       );
     }
 
-    // Save the PDF
-    doc.save("dashboard_report.pdf");
+    // Save the PDF with month in filename
+    doc.save(`dashboard_report_${monthName.toLowerCase()}_${year}.pdf`);
   };
 
   return (
