@@ -207,60 +207,73 @@ const Reservation = () => {
           </div>
 
           {/* Reservations Table */}
-          <div className="row my-7">
-            <div className="container">
-              <div className="row justify-content-center">
-                <div className="col-12">
-                  <div className="card">
-                    <div className="card-body p-0">
-                      <div
-                        className="table-responsive table-scroll"
-                        style={{ position: "relative", height: "760px" }}
-                      >
-                        <table className="table table-bordered custom-table mb-0">
-                          <thead className="head">
-                            <tr>
-                              <th>ID</th>
-                              <th>Facility</th>
-                              <th>Date</th>
-                              <th>Time</th>
-                              <th>Content</th>
-                              <th>Status</th>
-                              <th>Action</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {filteredReservations.map((reservation) => (
-                              <tr key={reservation.reservation_id}>
-                                <td>{reservation.reservation_id}</td>
-                                <td>{reservation.facility_name}</td>
-                                <td>{reservation.reservation_date}</td>
-                                <td>{reservation.reservation_time}</td>
-                                <td className="content-cell">{reservation.content}</td>
-                                <td>{reservation.status}</td>
-                                <td>
+          <div className="row my-4">
+            <div className="col-12">
+              <div className="card border-0 shadow-sm">
+                <div className="card-header bg-white py-3">
+                  <div className="d-flex justify-content-between align-items-center">
+                    <h5 className="card-title mb-0">Reservation Requests</h5>
+                    <div className="search-box">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search reservations..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className="card-body p-0">
+                  <div className="table-container">
+                    <div className="table-scroll">
+                      <table className="table table-hover mb-0">
+                        <thead>
+                          <tr>
+                            <th style={{ width: '8%' }}>ID</th>
+                            <th style={{ width: '12%' }}>Facility</th>
+                            <th style={{ width: '15%' }}>Date</th>
+                            <th style={{ width: '12%' }}>Time</th>
+                            <th style={{ width: '28%' }}>Content</th>
+                            <th style={{ width: '10%' }}>Status</th>
+                            <th style={{ width: '15%' }}>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredReservations.map((reservation) => (
+                            <tr key={reservation.reservation_id}>
+                              <td>#{reservation.reservation_id}</td>
+                              <td>{reservation.facility_name}</td>
+                              <td>{new Date(reservation.reservation_date).toLocaleDateString()}</td>
+                              <td>{reservation.reservation_time}</td>
+                              <td>{reservation.content}</td>
+                              <td>
+                                <span className={`status-badge status-${reservation.status.toLowerCase()}`}>
+                                  {reservation.status}
+                                </span>
+                              </td>
+                              <td>
+                                <div className="d-flex gap-2">
                                   <button
-                                    className="btn btn-success btn-sm"
-                                    onClick={() =>
-                                      acceptReservation(reservation.reservation_id, reservation.user_id)
-                                    }
+                                    className="btn btn-success btn-sm px-3"
+                                    onClick={() => acceptReservation(reservation.reservation_id, reservation.user_id)}
                                   >
+                                    <i className="bx bx-check me-1"></i>
                                     Accept
                                   </button>
                                   <button
-                                    className="btn btn-danger btn-sm"
-                                    onClick={() =>
-                                      openRejectModal(reservation.reservation_id, reservation.user_id)
-                                    }
+                                    className="btn btn-danger btn-sm px-3"
+                                    onClick={() => openRejectModal(reservation.reservation_id, reservation.user_id)}
                                   >
+                                    <i className="bx bx-x me-1"></i>
                                     Reject
                                   </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>

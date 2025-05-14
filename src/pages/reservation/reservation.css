@@ -270,6 +270,175 @@ thead {
   background-color: #c82333;
 }
 
+/* Table Container */
+.table-container {
+  position: relative;
+  height: calc(100vh - 300px);
+  overflow: hidden;
+}
+
+.table-scroll {
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* Table Styles */
+.table {
+  margin-bottom: 0;
+  width: 100%;
+  min-width: 1000px;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  padding: 1rem;
+  white-space: nowrap;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 0.35rem 0.75rem;
+  border-radius: 50rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: inline-block;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-accepted {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Search Box */
+.search-box {
+  position: relative;
+  width: 300px;
+}
+
+.search-box input {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #dee2e6;
+}
+
+.search-box input:focus {
+  border-color: #668678;
+  box-shadow: 0 0 0 0.2rem rgba(102, 134, 120, 0.25);
+}
+
+/* Action Buttons */
+.btn-sm {
+  padding: 0.4rem 0.6rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  margin: 0 2px;
+}
+
+.btn-sm i {
+  font-size: 0.875rem;
+  margin-right: 0.25rem;
+}
+
+/* Table Cell for Actions */
+.table td:last-child {
+  padding: 0.5rem;
+  min-width: 160px;
+  white-space: nowrap;
+}
+
+.table td:last-child .d-flex {
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Button Colors and Hover States */
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .search-box {
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+  }
+  
+  .table-container {
+    height: calc(100vh - 350px);
+  }
+
+  .btn-sm {
+    padding: 0.35rem 0.5rem;
+    min-width: 50px;
+  }
+  
+  .table td:last-child {
+    min-width: 140px;
+  }
+}
+
+/* Custom Scrollbar */
+.table-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-scroll::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb {
+  background: #668678;
+  border-radius: 3px;
+}
+
+.table-scroll::-webkit-scrollbar-thumb:hover {
+  background: #557567;
+}
+
 @media (min-width: 768px) {
   #sidebar-wrapper {
     margin-left: 0;
