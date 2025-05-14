@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import CompileService from "../../service/CompileService";
 import Swal from "sweetalert2";
-import "bootstrap/dist/css/bootstrap.min.css";
-import './login.css';
+import buena from "../../assets/buena.jpg";
+
 
 const Login = () => {
   const {
@@ -72,78 +72,63 @@ const Login = () => {
     }
   };
 
+
+
   return (
-    <div className="wrapper">
-      <div className="container main">
-        <div className="row">
-          <div className="col-md-6 side-image">
-            {/* Add your image or content here */}
-            <div className="text"></div>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="flex w-full max-w-4xl rounded-lg overflow-hidden shadow-lg">
+        {/* Left image section */}
+        <div className="hidden md:block w-1/2 relative">
+          <img
+            src={buena}
+            alt="Background"
+            className="w-full h-full object-cover rounded-l-2xl"
+          />
+        </div>
 
-          <div className="col-md-6 right">
-            <div className="input-box">
-              <header>Login Your Account</header>
+        {/* Right form section */}
+        <div className="w-full md:w-1/2 bg-white p-8 flex items-center justify-center">
+          <form onSubmit={handleSubmit(onLogin)} className="w-full max-w-xs space-y-6">
+            <h2 className="text-xl font-bold text-center">Login Your Account</h2>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit(onLogin)}>
-                <div className="input-field">
-                  <input
-                    type="text"
-                    className="input"
-                    id="email"
-                    {...register("email", {
-                      required: "Email is required",
-                      pattern: /^\S+@\S+$/i,
-                    })}
-                    autoComplete="off"
-                  />
-                  <label htmlFor="email">Email</label>
-                  {errors.email && (
-                    <span className="error">{errors.email.message}</span>
-                  )}
-                </div>
-
-                <div className="input-field">
-                  <input
-                    type={passwordVisible ? "text" : "password"}
-                    className="input"
-                    id="pass"
-                    {...register("password", {
-                      required: "Password is required",
-                    })}
-                  />
-                  <label htmlFor="pass">Password</label>
-                  <button
-                    type="button"
-                    className="toggle-password"
-                    onClick={togglePasswordVisibility}
-                  >
-                    {passwordVisible ? "Hide" : "Show"}
-                  </button>
-                  {errors.password && (
-                    <span className="error">{errors.password.message}</span>
-                  )}
-                </div>
-
-                <div className="input-field">
-                  <input type="submit" className="submit" value="Sign Up" />
-                </div>
-              </form>
-
-              {loginError && (
-                <div className="error-message">{errorMessage}</div>
+            {/* Email */}
+            <div>
+              <input
+                type="email"
+                placeholder="Email"
+                {...register("email", { required: "Email is required" })}
+                className="w-full border-b border-gray-300 py-2 outline-none focus:border-green-600"
+              />
+              {errors.email && (
+                <span className="text-sm text-red-600">{errors.email.message}</span>
               )}
             </div>
-          </div>
+
+            {/* Password */}
+            <div>
+              <input
+                type="password"
+                placeholder="Password"
+                {...register("password", { required: "Password is required" })}
+                className="w-full border-b border-gray-300 py-2 outline-none focus:border-green-600"
+              />
+              {errors.password && (
+                <span className="text-sm text-red-600">{errors.password.message}</span>
+              )}
+            </div>
+
+            {/* Submit button */}
+            <div>
+              <button
+                type="submit"
+                className="w-full py-2 bg-gray-200 hover:bg-green-600 hover:text-white rounded transition"
+              >
+                Sign Up
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-
-      <div className="shape shape-one"></div>
-      <div className="shape shape-two"></div>
-      <div className="shape shape-three"></div>
-      <div className="shape shape-four"></div>
-      <div className="shape shape-five"></div>
     </div>
   );
 };
