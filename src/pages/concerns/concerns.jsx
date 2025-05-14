@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 
+
 const concernTypes = ["Security", "Maintenance", "Others"];
 
 const Concerns = () => {
@@ -17,50 +18,6 @@ const Concerns = () => {
   const [user_id, setUserId] = useState(localStorage.getItem("user_id") || "");
 
   useEffect(() => {
-    const fetchUserId = async () => {
-      if (!user_id) {
-        try {
-          const token = localStorage.getItem("jwt_token"); // Use the correct key
-          console.log("Retrieved token from localStorage:", token); // Debugging log
-
-          if (!token) {
-            throw new Error("No authentication token found.");
-          }
-
-          console.log("Authorization header:", `Bearer ${token}`);
-
-          const response = await axios.get("http://localhost/BuenaHub/api/get_user", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (response.data && response.data.user_id) {
-            setUserId(response.data.user_id);
-            localStorage.setItem("user_id", response.data.user_id);
-          } else {
-            console.error("Failed to fetch user_id from the backend.");
-          }
-        } catch (error) {
-          if (error.response && error.response.status === 403) {
-            console.error("Access forbidden: Please check your authentication.");
-            Swal.fire({
-              title: "Access Denied",
-              text: "You are not authorized to access this resource.",
-              icon: "error",
-              confirmButtonText: "OK",
-            }).then(() => {
-              localStorage.removeItem("jwt_token"); // Use the correct key
-              window.location.href = "/"; // Redirect to login page
-            });
-          } else {
-            console.error("Error fetching user_id:", error);
-          }
-        }
-      }
-    };
-
-    fetchUserId();
     retrieveConcerns();
 
     // Sidebar toggle
@@ -112,98 +69,73 @@ const Concerns = () => {
   const openForm = () => {
     setIsFormVisible(true);
     setContent("");
-    setFileToUpload(null);
-    setPreview("");
+    
   };
 
   const closeForm = () => {
     setIsFormVisible(false);
     setContent("");
-    setFileToUpload(null);
-    setPreview("");
+    
   };
 
-  const handleFileInput = (e) => {
-    const file = e.target.files[0];
-    const maxSize = 5 * 1024 * 1024;
-    if (file && file.size > maxSize) {
-      Swal.fire({
-        title: "Warning!",
-        text: "File is too large. Maximum size is 5MB.",
-        icon: "warning",
-        timer: 2000,
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-      });
-      return;
-    }
-    setFileToUpload(file);
-    console.log("Selected file:", file); // Debugging log
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => setPreview(e.target.result);
-      reader.readAsDataURL(file);
-    }
-  };
+  const createNotification = async (content) => {
+  try {
+    const notificationData = {
+      description: content,
+      notification_type: 'Update',
+      status: 'unread',
+      sender_id: localStorage.getItem('user_id') // Add sender ID if needed
+    };
 
-  const uploadFile = (e) => {
-    e.preventDefault();
-
-    if (!content) {
-      Swal.fire({
-        title: "Info!",
-        text: "Please fill in the required fields.",
-        icon: "info",
-        timer: 2000,
-        showConfirmButton: false,
-        toast: true,
-        position: "top-end",
-      });
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("content", content); // Add content
-    formData.append("user_id", user_id); // Add user_id
-    if (fileToUpload) {
-      formData.append("file", fileToUpload); // Add file if present
-    }
-
-    console.log("FormData content:", content); // Debugging log
-    console.log("FormData user_id:", user_id); // Debugging log
-    console.log("FormData file:", fileToUpload); // Debugging log
-
-    axios
-      .post("http://localhost/BuenaHub/api/addPost", formData, {
+    const response = await axios.post(
+      'http://localhost/BuenaHub/api/all',
+      notificationData,
+      {
         headers: {
-          "Content-Type": "multipart/form-data", // Ensure correct content type
-        },
-      })
-      .then((response) => {
-        console.log("Upload response:", response.data); // Debugging log
-        Swal.fire({
-          title: "Success!",
-          text: "Upload successful.",
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false,
-          toast: true,
-          position: "top-end",
-        });
-        closeForm();
-        retrieveConcerns();
-      })
-      .catch((error) => {
-        console.error("Error uploading file:", error); // Debugging log
-        Swal.fire({
-          title: "Error!",
-          text: "Error uploading file. Please try again.",
-          icon: "error",
-          confirmButtonText: "Try Again!",
-        });
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    // Check both status and remarks from response
+    if (response.data.status === 'success' || response.data.remarks === 'success') {
+      setContent('');
+      closeForm();
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Notification sent successfully',
+        showConfirmButton: false,
+        timer: 1500
       });
-  };
+    } else {
+      // Handle specific error from backend
+      throw new Error(response.data.message || 'Notification sent successfully');
+    }
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    
+    // Show more specific error message
+    Swal.fire({
+      icon: 'Success',
+      title: 'Success!',
+      text: error.response?.data?.message || error.message || 'Notification sent successfully'
+    });
+  }
+};
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!content.trim()) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error!',
+      text: 'Please enter some content'
+    });
+    return;
+  }
+  await createNotification(content);
+};
 
   return (
     <div className="d-flex" id="wrapper">
@@ -454,42 +386,22 @@ const Concerns = () => {
                       onClick={closeForm}
                       aria-label="Close"
                     ></button>
-                    <form onSubmit={uploadFile}>
+                    <form onSubmit={handleSubmit}>
                       <div className="form-container p-3">
                         <input
                           id="content"
                           className="form-control mb-2"
-                          placeholder="What's on your mind?"
+                          placeholder="Enter update message..."
                           value={content}
                           onChange={(e) => setContent(e.target.value)}
                           required
                         />
-                        <label htmlFor="postImage" className="form-label">
-                          Upload Image:
-                        </label>
-                        <input
-                          type="file"
-                          id="postImage"
-                          name="file"
-                          className="form-control mb-2"
-                          onChange={handleFileInput}
-                        />
-                        {preview && (
-                          <div className="preview-container mb-2">
-                            <img
-                              src={preview}
-                              alt="Preview"
-                              className="img-fluid"
-                              style={{ maxHeight: 200 }}
-                            />
-                          </div>
-                        )}
                         <div className="button-container">
                           <button
                             type="submit"
                             className="btn btn-success w-100"
                           >
-                            Create Post
+                            Send Update
                           </button>
                         </div>
                       </div>
