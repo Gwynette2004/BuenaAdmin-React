@@ -18,8 +18,6 @@ import "./home.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-
-
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -41,6 +39,12 @@ const Home = () => {
     labels: [],
     datasets: [],
   });
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+const toggleSidebar = () => {
+  setIsSidebarOpen(!isSidebarOpen);
+};
+
   const [pieChartData, setPieChartData] = useState({
     labels: [],
     datasets: [],
@@ -297,270 +301,275 @@ const generatePDF = () => {
   doc.save("dashboard_report.pdf");
 };
 
-  return (
-    <div className="d-flex" id="wrapper">
-      {/* Sidebar */}
-      <div
-        className="bg-white"
-        id="sidebar-wrapper"
-        style={{ position: "fixed", height: "100vh", width: "250px" }}
-      >
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">
-          BuenaVista
+return (
+  <div id="wrapper" className="flex">
+    {/* Sidebar */}
+<div
+  className="bg-white"
+  id="sidebar-wrapper"
+  style={{ position: "fixed", height: "100vh", width: 250 }}
+>
+  <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">
+    BuenaVista
+  </div>
+  <div className="list-group list-group-flush my-1">
+    <a
+      href="/home"
+      className="list-group-item list-group-item-action bg-transparent second-text active"
+    >
+      <i className="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+    <a
+      href="/invoice"
+      className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+    >
+      <i className="bx bxs-file me-2"></i>Invoice
+    </a>
+    <a
+      href="/residents"
+      className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+    >
+      <i className="bx bx-male-female me-2"></i>Residents
+    </a>
+    <a
+      href="/concerns"
+      className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+    >
+      <i className="bx bxs-bell-ring me-2"></i>Concerns
+    </a>
+    <a
+      href="/reservations"
+      className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+    >
+      <i className="bx bxs-bookmark-star me-2"></i>Reservations
+    </a>
+    <a
+      href="#"
+      className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
+    >
+      <i className="fas fa-power-off me-2"></i>Logout
+    </a>
+  </div>
+</div>
+
+
+    {/* Main Content */}
+    <div id="page-content-wrapper" className="ml-[250px] w-full">
+      <nav className="bg-transparent mt-2 py-4 px-4 mb-6">
+        <div className="flex items-center">
+          <i
+            id="menu-toggle"
+            className="fas fa-align-left text-[#4a6c5e] text-xl mr-3 cursor-pointer"
+          ></i>
+          <h2 className="text-2xl m-0">Dashboard</h2>
         </div>
-        <div className="list-group list-group-flush my-1">
-          <a
-            href="/home"
-            className="list-group-item list-group-item-action bg-transparent second-text active"
-          >
-            <i className="fas fa-tachometer-alt me-2"></i>Dashboard
-          </a>
-          <a
-            href="/invoice"
-            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
-          >
-            <i className="bx bxs-file me-2"></i>Invoice
-          </a>
-          <a
-            href="/residents"
-            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
-          >
-            <i className="bx bx-male-female me-2"></i>Residents
-          </a>
-          <a
-            href="/concerns"
-            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
-          >
-            <i className="bx bxs-bell-ring me-2"></i>Concerns
-          </a>
-          <a
-            href="/reservations"
-            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
-          >
-            <i className="bx bxs-bookmark-star me-2"></i>Reservations
-          </a>
-          <a
-            href="#"
-            className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
-          >
-            <i className="fas fa-power-off me-2"></i>Logout
-          </a>
+      </nav>
+
+      <div className="px-4">
+        {/* Top Controls */}
+        <div className="flex items-center space-x-4 mb-4">
+          <div>
+            <select
+              className="border border-gray-300 rounded px-3 py-2"
+              value={selectedMonth}
+              onChange={handleMonthChange}
+            >
+              <option value="Yearly">Yearly</option>
+              {[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December",
+              ].map((month, index) => (
+                <option key={index} value={index}>
+                  {month}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+<button
+  className="bg-green-800 hover:bg-[#3a534a] text-white font-bold py-2 px-4 rounded"
+  onClick={generatePDF} // ← must be this function
+>
+  Generate PDF
+</button>
+          </div>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div
-        id="page-content-wrapper"
-        style={{ marginLeft: "250px", width: "calc(100% - 250px)" }}
-      >
-        <nav className="navbar navbar-expand-lg navbar-light bg-transparent mb-20 mt-2 px-4">
-          <div className="d-flex align-items-center">
-            <i
-              className="fas fa-align-left primary-text fs-4 me-3"
-              id="menu-toggle"
-            ></i>
-            <h2 className="fs-2 m-0">Dashboard</h2>
-          </div>
-        </nav>
-
-        <div className="container-fluid px-4">
-          <div className="row mb-4">
-            <div className="col-auto">
-              <select
-                className="form-select"
-                value={selectedMonth}
-                onChange={handleMonthChange}
-              >
-                <option value="Yearly">Yearly</option>
-                {[
-                  "January",
-                  "February",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                  "July",
-                  "August",
-                  "September",
-                  "October",
-                  "November",
-                  "December",
-                ].map((month, index) => (
-                  <option key={index} value={index}>
-                    {month}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="col-auto">
-              <button className="btn btn-primary" onClick={generatePDF}>
-                Generate PDF
-              </button>
+        {/* Stats Section */}
+        <div className="flex flex-wrap justify-center my-4">
+          <div className="w-full sm:w-1/2 lg:w-1/3 p-2">
+            <div className="shadow p-4 bg-white flex justify-around items-center rounded">
+              <div>
+                <h3 className="text-2xl">{userCount}</h3>
+                <p className="text-lg">Residents</p>
+              </div>
+              <i className="bx bx-male-female text-4xl text-[#4a6c5e] border rounded-full bg-[#cfcfcf] p-3"></i>
             </div>
           </div>
-
-          <div className="row justify-content-center my-4">
-            <div className="col-12 col-sm-6 col-lg-4 p-2">
-              <div className="box shadow p-4 bg-white d-flex justify-content-around align-items-center rounded">
-                <div>
-                  <h3 className="fs-2">{userCount}</h3>
-                  <p className="fs-5">Residents</p>
-                </div>
-                <i className="bx bx-male-female fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+          <div className="w-full sm:w-1/2 lg:w-1/3 p-2">
+            <div className="shadow p-4 bg-white flex justify-around items-center rounded">
+              <div>
+                <h3 className="text-2xl">{concernCount}</h3>
+                <p className="text-lg">Concerns</p>
               </div>
-            </div>
-
-            <div className="col-12 col-sm-6 col-lg-4 p-2">
-              <div className="box shadow p-4 bg-white d-flex justify-content-around align-items-center rounded">
-                <div>
-                  <h3 className="fs-2">{concernCount}</h3>
-                  <p className="fs-5">Concerns</p>
-                </div>
-                <i className="bx bxs-bell-ring fs-1 primary-text border rounded-full secondary-bg p-3"></i>
-              </div>
-            </div>
-
-            <div className="col-12 col-sm-6 col-lg-4 p-2">
-              <div className="box shadow p-4 bg-white d-flex justify-content-around align-items-center rounded">
-                <div>
-                  <h3 className="fs-2">{reservationCount}</h3>
-                  <p className="fs-5">Reservations</p>
-                </div>
-                <i className="bx bxs-bookmark-star fs-1 primary-text border rounded-full secondary-bg p-3"></i>
-              </div>
+              <i className="bx bxs-bell-ring text-4xl text-[#4a6c5e] border rounded-full bg-[#cfcfcf] p-3"></i>
             </div>
           </div>
-
-          <div className="row g-3 my-2">
-            <div className="col-md-7">
-              <div className="p-3 bg-white shadow rounded">
-                {barChartData.datasets && barChartData.datasets.length > 0 ? (
-                  <Bar data={barChartData} />
-                ) : (
-                  <p>Loading bar chart...</p>
-                )}
+          <div className="w-full sm:w-1/2 lg:w-1/3 p-2">
+            <div className="shadow p-4 bg-white flex justify-around items-center rounded">
+              <div>
+                <h3 className="text-2xl">{reservationCount}</h3>
+                <p className="text-lg">Reservations</p>
               </div>
-            </div>
-
-            <div className="col-md-5">
-              <div className="p-3 bg-white shadow rounded">
-                {barChartData.datasets && barChartData.datasets.length > 0 ? (
-                  <Pie data={pieChartData} />
-                ) : (
-                  <p>Loading pie chart...</p>
-                )}
-              </div>
+              <i className="bx bxs-bookmark-star text-4xl text-[#4a6c5e] border rounded-full bg-[#cfcfcf] p-3"></i>
             </div>
           </div>
+        </div>
 
-          <div className="row g-4 my-4">
-            <div className="col-md-5 col-sm-12">
-              <a
-                href="/concerns"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <div
-                  className="p-3 bg-white shadow rounded"
-                  style={{
-                    height: "500px",
-                    display: "flex",
-                    flexDirection: "column",
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 my-2">
+          <div className="md:col-span-7">
+            <div className="p-3 bg-white shadow rounded h-[450px]">
+              {barChartData.datasets.length > 0 ? (
+                <Bar
+                  data={barChartData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: { display: false },
+                    },
                   }}
-                >
-                  <h3 className="fs-5 mb-3">Concerns</h3>
-                  <div style={{ flex: 1, overflowY: "auto" }}>
-                    <table className="table bg-white rounded shadow-sm table-hover mb-0">
-                      <thead>
-                        <tr>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Concern</th>
-                          <th>Date</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {concerns.map((concern, index) => (
-                          <tr key={index}>
-                            <td>{concern.name}</td>
-                            <td>{concern.email}</td>
-                            <td>{concern.concern}</td>
-                            <td>{concern.created_at}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </a>
+                />
+              ) : (
+                <p>Loading bar chart...</p>
+              )}
             </div>
+          </div>
 
-            <div className="col-md-7 col-sm-12">
-              <a
-                href="/reservations"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <div
-                  className="p-3 bg-white shadow rounded"
-                  style={{
-                    height: "500px",
-                    display: "flex",
-                    flexDirection: "column",
+          <div className="md:col-span-5">
+            <div className="p-3 bg-white shadow rounded h-[450px]">
+              {pieChartData.datasets.length > 0 ? (
+                <Pie
+                  data={pieChartData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: {
+                        position: "bottom",
+                        labels: { boxWidth: 15 },
+                      },
+                    },
                   }}
-                >
-                  <h3 className="fs-5 mb-3">Reservations</h3>
-                  <div style={{ flex: 1, overflowY: "auto" }}>
-                    <table className="table bg-white rounded shadow-sm table-hover mb-0">
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Facility</th>
-                          <th>Date</th>
-                          <th>Time</th>
-                          <th>Content</th>
-                          <th>Status</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {reservations.map((reservation, index) => (
-                          <tr key={index}>
-                            <td>{reservation.reservation_id}</td>
-                            <td>{reservation.facility_name}</td>
-                            <td>{reservation.reservation_date}</td>
-                            <td>{reservation.reservation_time}</td>
-                            <td>{reservation.content}</td>
-                            <td>{reservation.status}</td>
-                            <td>
-                              <button
-                                onClick={() =>
-                                  acceptReservation(reservation.reservation_id)
-                                }
-                                className="btn btn-success btn-sm"
-                              >
-                                Accept
-                              </button>
-                              <button
-                                onClick={() =>
-                                  rejectReservation(reservation.reservation_id)
-                                }
-                                className="btn btn-danger btn-sm"
-                              >
-                                Reject
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </a>
+                />
+              ) : (
+                <p>Loading pie chart...</p>
+              )}
             </div>
+          </div>
+        </div>
+
+        {/* Tables Section */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 my-4">
+          <div className="md:col-span-5">
+            <a href="/concerns" className="no-underline text-current">
+              <div className="p-3 bg-white shadow rounded h-[500px] flex flex-col">
+                <h3 className="text-lg mb-3">Concerns</h3>
+                <div className="flex-1 overflow-y-auto">
+                  <table className="w-full bg-white rounded shadow-sm hover:shadow-md mb-0">
+                    <thead className="bg-[#4a6c5e] text-white text-center">
+                      <tr>
+                        <th className="py-2">Name</th>
+                        <th className="py-2">Email</th>
+                        <th className="py-2">Concern</th>
+                        <th className="py-2">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-left text-sm">
+                      {concerns.map((concern, index) => (
+                        <tr key={index} className="border-b">
+                          <td className="py-2 px-2">{concern.name}</td>
+                          <td className="py-2 px-2">{concern.email}</td>
+                          <td className="py-2 px-2">{concern.concern}</td>
+                          <td className="py-2 px-2">{concern.created_at}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </a>
+          </div>
+
+          <div className="md:col-span-7">
+            <a href="/reservations" className="no-underline text-current">
+              <div className="p-3 bg-white shadow rounded h-[500px] flex flex-col">
+                <h3 className="text-lg mb-3">Reservations</h3>
+                <div className="flex-1 overflow-y-auto">
+                  <table className="w-full bg-white rounded shadow-sm hover:shadow-md mb-0">
+                    <thead className="bg-[#4a6c5e] text-white text-center">
+                      <tr>
+                        <th className="py-2">ID</th>
+                        <th className="py-2">Facility</th>
+                        <th className="py-2">Date</th>
+                        <th className="py-2">Time</th>
+                        <th className="py-2">Content</th>
+                        <th className="py-2">Status</th>
+                        <th className="py-2">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-left text-sm">
+                      {reservations.map((reservation, index) => (
+                        <tr key={index} className="border-b">
+                          <td className="py-2 px-2">{reservation.reservation_id}</td>
+                          <td className="py-2 px-2">{reservation.facility_name}</td>
+                          <td className="py-2 px-2">{reservation.reservation_date}</td>
+                          <td className="py-2 px-2">{reservation.reservation_time}</td>
+                          <td className="py-2 px-2">{reservation.content}</td>
+                          <td className="py-2 px-2">{reservation.status}</td>
+                          <td className="py-2 px-2">
+                            <button
+                              onClick={() =>
+                                acceptReservation(reservation.reservation_id)
+                              }
+                              className="bg-green-500 hover:bg-green-600 text-white text-sm px-2 py-1 rounded"
+                            >
+                              Accept
+                            </button>
+                            <button
+                              onClick={() =>
+                                rejectReservation(reservation.reservation_id)
+                              }
+                              className="bg-red-500 hover:bg-red-600 text-white text-sm px-2 py-1 rounded ml-2"
+                            >
+                              Reject
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </a>
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
 };
 
 export default Home;

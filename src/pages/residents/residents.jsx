@@ -275,7 +275,15 @@ const Residents = () => {
       {/* Main Content */}
       <div id="page-content-wrapper" className="bg-light">
         {/* Navbar */}
-
+        <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+          <div className="d-flex align-items-center">
+            <i
+              className="fas fa-align-left primary-text fs-4 me-3"
+              id="menu-toggle"
+            ></i>
+            <h2 className="fs-2 m-0">Residents</h2>
+          </div>
+        </nav>
 
         {/* Main Content Area */}
         <div className="container-fluid px-4 py-4">
