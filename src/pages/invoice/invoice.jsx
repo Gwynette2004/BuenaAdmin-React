@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate
+import CompileService from "../../service/CompileService";
+
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -26,6 +29,9 @@ const Invoice = () => {
   const [isImageModalVisible, setIsImageModalVisible] = useState(false);
   const [selectedBillImage, setSelectedBillImage] = useState('');
   const [notifications, setNotifications] = useState([]);
+const navigate = useNavigate();
+const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   useEffect(() => {
     retrieveUsers();
@@ -209,7 +215,17 @@ const Invoice = () => {
   }, []);
 
 
-
+  const logout = () => {
+    CompileService.logout(); // Clear the JWT token
+    Swal.fire({
+      title: "Logged Out",
+      text: "You have been successfully logged out.",
+      icon: "success",
+      confirmButtonText: "Okay",
+    }).then(() => {
+      navigate("/"); // Redirect to the login page
+    });
+  };
   // Add this function after your existing functions
   const sendNotification = async (userId, description, type) => {
     try {
@@ -226,29 +242,61 @@ const Invoice = () => {
 
   return (
     <div className="d-flex" id="wrapper">
-      {/* Sidebar */}
-      <div className="bg-white" id="sidebar-wrapper" style={{ position: 'fixed', height: '100vh', width: 250 }}>
-        <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">BuenaVista</div>
-        <div className="list-group list-group-flush my-1">
-          <a href="/home" className="list-group-item list-group-item-action bg-transparent second-text active">
-            <i className="fas fa-tachometer-alt me-2"></i>Dashboard
-          </a>
-          <a href="/invoice" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-            <i className='bx bxs-file me-2'></i>Invoice
-          </a>
-          <a href="/residents" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-            <i className='bx bx-male-female me-2'></i>Residents
-          </a>
-          <a href="/concerns" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-            <i className='bx bxs-bell-ring me-2'></i>Concerns
-          </a>
-          <a href="/reservations" className="list-group-item list-group-item-action bg-transparent second-text fw-bold">
-            <i className='bx bxs-bookmark-star me-2'></i>Reservations
-          </a>
-          <a href="#" className="list-group-item list-group-item-action bg-transparent text-danger fw-bold">
-            <i className="fas fa-power-off me-2"></i>Logout
-          </a>
+            {/* Sidebar */}
+      <div
+        className="bg-white"
+        id="sidebar-wrapper"
+        style={{
+          position: "fixed",
+          height: "100vh",
+          width: isSidebarOpen ? 250 : 0,
+          transition: "width 0.3s ease-in-out",
+          overflow: "hidden",
+        }}
+      >
+        <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">
+          BuenaVista
         </div>
+        <div className="list-group list-group-flush my-1">
+          <Link
+            to="/home"
+            className="list-group-item list-group-item-action bg-transparent second-text active"
+          >
+            <i className="fas fa-tachometer-alt me-2"></i>Dashboard
+          </Link>
+          <Link
+            to="/invoice"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
+            <i className="bx bxs-file me-2"></i>Invoice
+          </Link>
+          <Link
+            to="/residents"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
+            <i className="bx bx-male-female me-2"></i>Residents
+          </Link>
+          <Link
+            to="/concerns"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
+            <i className="bx bxs-bell-ring me-2"></i>Concerns
+          </Link>
+          <Link
+            to="/reservations"
+            className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
+          >
+            <i className="bx bxs-bookmark-star me-2"></i>Reservations
+          </Link>
+          <button
+            onClick={logout} // Attach the logout function
+            className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
+            style={{ border: "none", background: "none", cursor: "pointer" }}
+          >
+            <i className="fas fa-power-off me-2"></i>Logout
+          </button>
+        </div>
+      
       </div>
       <div id="page-content-wrapper" style={{ marginLeft: 250, width: 'calc(100% - 250px)' }}>
         <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4 mb-10">

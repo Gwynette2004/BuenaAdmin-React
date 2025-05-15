@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CompileService from "../../service/CompileService";
 import Swal from "sweetalert2";
-import { useNavigate, Link } from "react-router-dom"; // Import useNavigate and Link
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,

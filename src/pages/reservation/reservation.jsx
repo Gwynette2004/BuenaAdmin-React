@@ -4,6 +4,10 @@ import Swal from "sweetalert2";
 import "./reservation.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { Link, useNavigate } from "react-router-dom";
+import CompileService from "../../service/CompileService";
+
+
 
 const Reservation = () => {
   const [reservations, setReservations] = useState([]);
@@ -14,6 +18,10 @@ const Reservation = () => {
   const [selectedReservationId, setSelectedReservationId] = useState(null);
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const navigate = useNavigate();
+
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   useEffect(() => {
     retrieveReservations();
@@ -32,6 +40,7 @@ const Reservation = () => {
       console.error("Error fetching reservations:", error);
     }
   };
+
 
   const filterByVenue = (venue) => {
     setSelectedVenue(venue);
@@ -144,7 +153,17 @@ const Reservation = () => {
       });
     }
   };
-
+  const logout = () => {
+    CompileService.logout(); // Clear the JWT token
+    Swal.fire({
+      title: "Logged Out",
+      text: "You have been successfully logged out.",
+      icon: "success",
+      confirmButtonText: "Okay",
+    }).then(() => {
+      navigate("/"); // Redirect to the login page
+    });
+  };
   const sendNotification = async (userId, description, type) => {
     try {
       await axios.post(
@@ -163,52 +182,59 @@ const Reservation = () => {
 
   return (
     <div className="d-flex" id="wrapper">
-      {/* Sidebar */}
+           {/* Sidebar */}
       <div
         className="bg-white"
         id="sidebar-wrapper"
-        style={{ position: "fixed", height: "100vh", width: "250px" }}
+        style={{
+          position: "fixed",
+          height: "100vh",
+          width: isSidebarOpen ? 250 : 0,
+          transition: "width 0.3s ease-in-out",
+          overflow: "hidden",
+        }}
       >
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">
+        <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">
           BuenaVista
         </div>
         <div className="list-group list-group-flush my-1">
-          <a
-            href="/home"
+          <Link
+            to="/home"
             className="list-group-item list-group-item-action bg-transparent second-text active"
           >
             <i className="fas fa-tachometer-alt me-2"></i>Dashboard
-          </a>
-          <a
-            href="/invoice"
+          </Link>
+          <Link
+            to="/invoice"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-file me-2"></i>Invoice
-          </a>
-          <a
-            href="/residents"
+          </Link>
+          <Link
+            to="/residents"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bx-male-female me-2"></i>Residents
-          </a>
-          <a
-            href="/concerns"
+          </Link>
+          <Link
+            to="/concerns"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-bell-ring me-2"></i>Concerns
-          </a>
-          <a
-            href="/reservations"
+          </Link>
+          <Link
+            to="/reservations"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-bookmark-star me-2"></i>Reservations
-          </a>
-          <a
-            href="#"
+          </Link>
+          <button
+            onClick={logout} // Attach the logout function
             className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
+            style={{ border: "none", background: "none", cursor: "pointer" }}
           >
             <i className="fas fa-power-off me-2"></i>Logout
-          </a>
+          </button>
         </div>
       </div>
 

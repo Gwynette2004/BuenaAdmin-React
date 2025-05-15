@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate
+import CompileService from "../../service/CompileService";
+
 
 
 const concernTypes = ["Security", "Maintenance", "Others"];
@@ -16,6 +19,21 @@ const Concerns = () => {
   const [fileToUpload, setFileToUpload] = useState(null);
   const [preview, setPreview] = useState("");
   const [user_id, setUserId] = useState(localStorage.getItem("user_id") || "");
+const navigate = useNavigate();
+const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
+
+const logout = () => {
+  localStorage.clear(); // Or if you're using a service like CompileService, call that here
+  Swal.fire({
+    title: "Logged Out",
+    text: "You have been successfully logged out.",
+    icon: "success",
+    confirmButtonText: "Okay",
+  }).then(() => {
+    navigate("/"); // Redirect to the login page
+  });
+};
 
   useEffect(() => {
     retrieveConcerns();
@@ -97,6 +115,8 @@ const Concerns = () => {
       }
     );
 
+
+
     // Check both status and remarks from response
     if (response.data.status === 'success' || response.data.remarks === 'success') {
       setContent('');
@@ -139,52 +159,59 @@ const handleSubmit = async (e) => {
 
   return (
     <div className="d-flex" id="wrapper">
-      {/* Sidebar */}
+            {/* Sidebar */}
       <div
         className="bg-white"
         id="sidebar-wrapper"
-        style={{ position: "fixed", height: "100vh", width: 250 }}
+        style={{
+          position: "fixed",
+          height: "100vh",
+          width: isSidebarOpen ? 250 : 0,
+          transition: "width 0.3s ease-in-out",
+          overflow: "hidden",
+        }}
       >
-        <div className="sidebar-heading text-center py-4 primary-text fs-5 fw-bold border-bottom">
+        <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">
           BuenaVista
         </div>
         <div className="list-group list-group-flush my-1">
-          <a
-            href="/home"
+          <Link
+            to="/home"
             className="list-group-item list-group-item-action bg-transparent second-text active"
           >
             <i className="fas fa-tachometer-alt me-2"></i>Dashboard
-          </a>
-          <a
-            href="/invoice"
+          </Link>
+          <Link
+            to="/invoice"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-file me-2"></i>Invoice
-          </a>
-          <a
-            href="/residents"
+          </Link>
+          <Link
+            to="/residents"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bx-male-female me-2"></i>Residents
-          </a>
-          <a
-            href="/concerns"
+          </Link>
+          <Link
+            to="/concerns"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-bell-ring me-2"></i>Concerns
-          </a>
-          <a
-            href="/reservations"
+          </Link>
+          <Link
+            to="/reservations"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-bookmark-star me-2"></i>Reservations
-          </a>
-          <a
-            href="#"
+          </Link>
+          <button
+            onClick={logout} // Attach the logout function
             className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
+            style={{ border: "none", background: "none", cursor: "pointer" }}
           >
             <i className="fas fa-power-off me-2"></i>Logout
-          </a>
+          </button>
         </div>
       </div>
 
