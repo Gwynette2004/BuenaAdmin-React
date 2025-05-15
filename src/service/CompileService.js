@@ -14,17 +14,32 @@ class CompileService {
 
   // User login
   async userLogin(data) {
-    try {
-      const response = await axios.post(`${this.baseUrl}/login.php`, data);
-      return response.data;
-    } catch (error) {
-      if (error.response?.status === 403) {
-        throw {
-          status: 403,
-          error: 'This account is archived and cannot log in',
+  try {
+    const response = await axios.post(`${this.baseUrl}/login.php`, data);
+
+    // Check if the response contains a JWT token
+    if (response.data?.jwt) {
+      // Decode the token to extract user details (e.g., user ID)
+      const decodedToken = this.decodeToken(response.data.jwt);
+      if (decodedToken?.data?.id) {
+        return {
+          jwt: response.data.jwt,
+          userId: decodedToken.data.id, // Extract user ID from the token
         };
+      } else {
+        throw new Error("User ID not found in the token.");
       }
-      throw error;
+    } else {
+      throw new Error("Login failed. No token returned.");
+    }
+  } catch (error) {
+    if (error.response?.status === 403) {
+      throw {
+        status: 403,
+        error: "This account is archived and cannot log in",
+      };
+    }
+    throw error;
     }
   }
 
