@@ -307,7 +307,13 @@ return (
 <div
   className="bg-white"
   id="sidebar-wrapper"
-  style={{ position: "fixed", height: "100vh", width: 250 }}
+  style={{ 
+    position: "fixed", 
+    height: "100vh", 
+    width: isSidebarOpen ? 250 : 0,
+    transition: 'width 0.3s ease-in-out',
+    overflow: 'hidden'
+  }}
 >
   <div className="sidebar-heading text-center py-4 success-text fs-5 fw-bold border-bottom">
     BuenaVista
@@ -354,16 +360,25 @@ return (
 
 
     {/* Main Content */}
-    <div id="page-content-wrapper" className="ml-[250px] w-full">
-      <nav className="bg-transparent mt-2 py-4 px-4 mb-6">
-        <div className="flex items-center">
-          <i
-            id="menu-toggle"
-            className="fas fa-align-left text-[#4a6c5e] text-xl mr-3 cursor-pointer"
-          ></i>
-          <h2 className="text-2xl m-0">Dashboard</h2>
-        </div>
-      </nav>
+    <div
+  id="page-content-wrapper"
+  style={{ 
+    marginLeft: isSidebarOpen ? 250 : 0,
+    width: isSidebarOpen ? "calc(100% - 250px)" : "100%",
+    transition: 'margin-left 0.3s ease-in-out, width 0.3s ease-in-out'
+  }}
+>
+      <nav className="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+          <div className="d-flex align-items-center">
+            <i
+              className="fas fa-align-left primary-text fs-4 me-3"
+              id="menu-toggle"
+              onClick={toggleSidebar}
+              style={{ cursor: 'pointer' }}
+            ></i>
+            <h2 className="fs-2 m-0">Dashboard</h2>
+          </div>
+        </nav>
 
       <div className="px-4">
         {/* Top Controls */}

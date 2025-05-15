@@ -49,7 +49,7 @@ const onLogin = async (data) => {
 
     // Store the JWT token in localStorage with the correct key
     localStorage.setItem("jwt_token", response.jwt);
-    console.log("Token saved in localStorage:", localStorage.getItem("jwt_token")); // Debugging log
+
 
     // Navigate to the home page
     navigate("/home");
