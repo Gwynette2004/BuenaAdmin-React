@@ -5,6 +5,7 @@ import CompileService from "../../service/CompileService";
 import Swal from "sweetalert2";
 import buena from "../../assets/buena.jpg";
 
+
 const Login = () => {
   const {
     register,
@@ -20,68 +21,59 @@ const Login = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const onLogin = async (data) => {
-    try {
-      const response = await CompileService.userLogin(data);
+const onLogin = async (data) => {
+  try {
+    const response = await CompileService.userLogin(data);
 
-      if (response.message === "This account is archived and cannot log in.") {
-        Swal.fire({
-          title: "Account Archived",
-          text: "Your account has been archived and cannot log in.",
-          icon: "error",
-          confirmButtonText: "Okay",
-        });
-        return; // Exit early to prevent further actions
-      }
-
-      // Show success message for login
+    if (response.message === "This account is archived and cannot log in.") {
       Swal.fire({
-        title: "Success",
-        text: "Welcome Admin!",
-        icon: "success",
-        confirmButtonText: "Great!",
-        position: "top-end",
-        toast: true,
-        timer: 2000,
-        showConfirmButton: false,
+        title: "Account Archived",
+        text: "Your account has been archived and cannot log in.",
+        icon: "error",
+        confirmButtonText: "Okay",
       });
-
-      // Store the JWT token in localStorage with the correct key
-      localStorage.setItem("jwt_token", response.jwt);
-
-      // Navigate to the home page
-      navigate("/home");
-      setLoginError(false);
-    } catch (error) {
-      setErrorMessage(error.message || "Invalid email or password.");
-      setLoginError(true);
-
-      // Handle archived account error
-      if (
-        error.status === 403 &&
-        error.error?.message === "This account is archived and cannot log in."
-      ) {
-        Swal.fire({
-          title: "Account Archived",
-          text: "Your account is archived and cannot log in.",
-          icon: "error",
-          confirmButtonText: "Okay",
-        });
-      }
+      return; // Exit early to prevent further actions
     }
-  };
 
-  // Logout function
-  const onLogout = () => {
-    localStorage.removeItem("jwt_token"); // Clear the JWT token
+    // Show success message for login
     Swal.fire({
-      title: "Logged Out",
-      text: "You have been successfully logged out.",
+      title: "Success",
+      text: "Welcome Admin!",
       icon: "success",
-      confirmButtonText: "Okay",
+      confirmButtonText: "Great!",
+      position: "top-end",
+      toast: true,
+      timer: 2000,
+      showConfirmButton: false,
     });
-    navigate("/login"); // Redirect to login page
-  };
+
+    // Store the JWT token in localStorage with the correct key
+    localStorage.setItem("jwt_token", response.jwt);
+
+
+    // Navigate to the home page
+    navigate("/home");
+    setLoginError(false);
+  } catch (error) {
+    setErrorMessage(error.message || "Invalid email or password.");
+    setLoginError(true);
+
+    // Handle archived account error
+    if (
+      error.status === 403 &&
+      error.error?.message === "This account is archived and cannot log in."
+    ) {
+      Swal.fire({
+        title: "Account Archived",
+        text: "Your account is archived and cannot log in.",
+        icon: "error",
+        confirmButtonText: "Okay",
+      });
+    }
+  }
+};
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -137,16 +129,6 @@ const Login = () => {
             </div>
           </form>
         </div>
-      </div>
-
-      {/* Logout button */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={onLogout}
-          className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
       </div>
     </div>
   );
