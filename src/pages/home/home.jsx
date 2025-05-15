@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import CompileService from "../../service/CompileService";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate, Link } from "react-router-dom"; // Import useNavigate and Link
 import { Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -333,36 +333,36 @@ const Home = () => {
           BuenaVista
         </div>
         <div className="list-group list-group-flush my-1">
-          <a
-            href="/home"
+          <Link
+            to="/home"
             className="list-group-item list-group-item-action bg-transparent second-text active"
           >
             <i className="fas fa-tachometer-alt me-2"></i>Dashboard
-          </a>
-          <a
-            href="/invoice"
+          </Link>
+          <Link
+            to="/invoice"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-file me-2"></i>Invoice
-          </a>
-          <a
-            href="/residents"
+          </Link>
+          <Link
+            to="/residents"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bx-male-female me-2"></i>Residents
-          </a>
-          <a
-            href="/concerns"
+          </Link>
+          <Link
+            to="/concerns"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-bell-ring me-2"></i>Concerns
-          </a>
-          <a
-            href="/reservations"
+          </Link>
+          <Link
+            to="/reservations"
             className="list-group-item list-group-item-action bg-transparent second-text fw-bold"
           >
             <i className="bx bxs-bookmark-star me-2"></i>Reservations
-          </a>
+          </Link>
           <button
             onClick={logout} // Attach the logout function
             className="list-group-item list-group-item-action bg-transparent text-danger fw-bold"
