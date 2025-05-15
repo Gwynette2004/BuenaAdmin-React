@@ -138,16 +138,6 @@ const Login = () => {
           </form>
         </div>
       </div>
-
-      {/* Logout button */}
-      <div className="absolute top-4 right-4">
-        <button
-          onClick={onLogout}
-          className="py-2 px-4 bg-red-500 text-white rounded hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
-      </div>
     </div>
   );
 };
